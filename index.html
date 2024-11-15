@@ -1,0 +1,52 @@
+<!DOCTYPE html> <!-- Určuje, že dokument je HTML5 -->
+<html lang="cs"> <!-- Určuje jazyk dokumentu (čeština) -->
+<head>
+    <meta charset="UTF-8"> <!-- Nastavuje kódování stránky na UTF-8 pro správné zobrazení znaků -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Nastaví stránku tak, aby byla dobře zobrazena na mobilních zařízeních -->
+    <title>Moje První Stránka</title> <!-- Titulek stránky, který se zobrazuje v záložce prohlížeče -->
+    <link rel="stylesheet" href="style.css"> <!-- Tento odkaz spojuje HTML s CSS souborem -->
+</head>
+<body>
+    <!-- Hlavní hlavička stránky -->
+    <header>
+        <h1>Vítejte na mojí stránce</h1> <!-- Hlavní nadpis stránky -->
+        <!-- Tlačítko pro přepnutí režimu -->
+        <button id="theme-toggle">Přepnout režim</button> 
+    </header>
+
+    <!-- Navigační menu -->
+    <nav>
+        <ul> <!-- Seznam odkazů pro navigaci -->
+            <li><a href="#home">Domů</a></li> <!-- Odkaz na domovskou stránku (přesměrování na sekci "home") -->
+            <li><a href="#about">O mně</a></li> <!-- Odkaz na sekci "O mně" -->
+            <li><a href="#contact">Kontakt</a></li> <!-- Odkaz na sekci "Kontakt" -->
+        </ul>
+    </nav>
+
+    <!-- Sekce pro domovskou stránku -->
+    <section id="home">
+        <h2>Domovská stránka</h2> <!-- Podnadpis pro tuto sekci -->
+        <p>Toto je moje první webová stránka.</p> <!-- Text na domovské stránce -->
+    </section>
+
+    <!-- Sekce "O mně" -->
+    <section id="about">
+        <h2>O mně</h2> <!-- Podnadpis pro sekci "O mně" -->
+        <p>Jsem student a učím se vytvářet weby!</p> <!-- Text o tobě -->
+    </section>
+
+    <!-- Sekce pro kontaktní informace -->
+    <section id="contact">
+        <h2>Kontakt</h2> <!-- Podnadpis pro sekci "Kontakt" -->
+        <p>Můžeš mě kontaktovat na e-mailu: example@email.com</p> <!-- Kontaktní informace -->
+    </section>
+
+    <!-- Patička stránky -->
+    <footer>
+        <p>© 2024 Moje stránka</p> <!-- Text v patičce stránky s informací o autorských právech -->
+    </footer>
+
+    <!-- Odkaz na JavaScript soubor -->
+    <script src="script.js"></script> <!-- Tady odkazujeme na náš JavaScript soubor -->
+</body>
+</html>
