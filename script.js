@@ -2,23 +2,26 @@ const themeToggleButton = document.getElementById('theme-toggle');
 document.body.classList.add('no-transition');
 
 const savedTheme = localStorage.getItem('theme');
+const icon = themeToggleButton.querySelector('div');
+
 if (savedTheme === 'dark') {
     document.body.classList.add('dark-mode');
+    icon.classList.replace('fa-sun', 'fa-moon');
 } else if (savedTheme === 'light') {
     document.body.classList.remove('dark-mode');
+    icon.classList.replace('fa-moon', 'fa-sun');
 } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    icon.classList.replace('fa-sun', 'fa-moon');
     document.body.classList.add('dark-mode');
 }
-
-window.addEventListener('load', () => {
-    document.body.classList.remove('no-transition');
-});
 
 themeToggleButton.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     if (document.body.classList.contains('dark-mode')) {
+        icon.classList.replace('fa-sun', 'fa-moon');
         localStorage.setItem('theme', 'dark');
     } else {
+        icon.classList.replace('fa-moon', 'fa-sun');
         localStorage.setItem('theme', 'light');
     }
 });
@@ -28,7 +31,7 @@ const canvas = document.getElementById('animationCanvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
-canvas.height = 150;
+canvas.height = 130;
 
 let circles = [];
 
@@ -47,10 +50,25 @@ function createCircle() {
     circles.push({ x, y, radius, speedX, speedY });
 }
 
+function saveCircles() {
+    localStorage.setItem('circlesData', JSON.stringify(circles));
+}
+
+function loadCircles() {
+    const savedCircles = localStorage.getItem('circlesData');
+    if (savedCircles) {
+        circles = JSON.parse(savedCircles);
+    } else {
+        let size = window.innerWidth / 38.4;
+        for (let i = 0; i < size; i++) {
+            createCircle();
+        }
+    }
+}
 
 function updateCircles() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    canvas.width = window.innerWidth;
 
     for (let i = 0; i < circles.length; i++) {
         let circle = circles[i];
@@ -97,10 +115,8 @@ function updateCircles() {
     requestAnimationFrame(updateCircles);
 }
 
-for (let i = 0; i < 50; i++) {
-    createCircle();
-}
+loadCircles();
 
 updateCircles();
 
-
+window.addEventListener('beforeunload', saveCircles);
