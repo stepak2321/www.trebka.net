@@ -1,0 +1,208 @@
+/*SEC*/
+
+/*ABOUT*/
+#about {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#about h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#about p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+/*mc.png*/
+
+#mcpng {
+    max-width: 1200px;
+    max-height: 500px;
+    margin-bottom: 100px;
+    padding: 30px;
+    border-radius: 40px;
+    position: absolute;
+    top: 230px;
+    left: 1550px;
+    transition: transform 0.3s ease-in-out;
+}
+
+#mcpng:active {
+    transform: scale(0.001);
+    transition: transform 0.5s ease-in-out;
+}
+
+/*subdomain.png*/
+
+#subdomainpng {
+    max-width: 570px;
+    max-height: 220px;
+    margin-bottom: 100px;
+    padding: 30px;
+    border-radius: 40px;
+    position: absolute;
+    top: 240px;
+    left: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+/*whatisthesubdomain*/
+
+#whatisthesubdomain {
+    max-width: 300px;
+    max-height: 500px;
+    margin-bottom: 100px;
+    padding: 30px;
+    border-radius: 15px;
+    position: absolute;
+    top: 450px;
+    left: 35px;
+}
+
+#whatisthesubdomain h2 {
+    font-size: 20px;
+}
+
+#whatisthesubdomain p {
+    font-size: 15px;
+}
+
+/*FAQ*/
+
+#FAQ {
+    font-size: 10px;
+    text-align: center;
+    margin-bottom: 100px;
+    padding: 30px;
+    border-radius: 15px;
+    position: absolute;
+    top: 100px;
+    left: 900px;
+}
+
+#FAQ1 {
+    width: 500px;
+    max-height: 500px;
+    margin-bottom: 100px;
+    padding: 30px;
+    border-radius: 15px;
+    position: absolute;
+    top: 100px;
+    left: 400px;
+}
+
+#FAQ1 p {
+    font-size: 20px;
+    text-align: center;
+}
+
+#FAQ2 {
+    width: 500px;
+    max-height: 500px;
+    margin-bottom: 100px;
+    padding: 30px;
+    border-radius: 15px;
+    position: absolute;
+    top: 100px;
+    left: 1000px;
+}
+
+#FAQ2 p {
+    font-size: 20px;
+    text-align: center;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+    #about {
+        padding: 20px;
+        margin: 15px;
+    }
+
+    #about h2 {
+        font-size: 1.5rem;
+    }
+
+    #about p {
+        font-size: 1rem;
+    }
+
+    #mcpng, #subdomainpng {
+        max-width: 100%;
+        max-height: auto;
+        margin-bottom: 50px;
+        left: 50%; /* Center images */
+        transform: translateX(-50%); /* Center horizontally */
+    }
+
+    #whatisthesubdomain {
+        max-width: 90%;
+        top: 450px;
+        left: 5%;
+    }
+
+    #FAQ, #FAQ1, #FAQ2 {
+        width: 90%;
+        left: 5%;
+        padding: 20px;
+    }
+
+    #FAQ1 p, #FAQ2 p {
+        font-size: 18px;
+    }
+
+    #whatisthesubdomain h2 {
+        font-size: 18px;
+    }
+
+    #whatisthesubdomain p {
+        font-size: 14px;
+    }
+}
+
+/* Extra small devices like mobile phones (portrait mode) */
+@media screen and (max-width: 480px) {
+    #about {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    #about h2 {
+        font-size: 1.2rem;
+    }
+
+    #about p {
+        font-size: 0.9rem;
+    }
+
+    #mcpng, #subdomainpng {
+        max-width: 100%;
+        max-height: auto;
+        left: 50%; /* Center images */
+        transform: translateX(-50%); /* Center horizontally */
+    }
+
+    #FAQ, #FAQ1, #FAQ2 {
+        width: 90%;
+        left: 5%;
+        padding: 15px;
+    }
+
+    #FAQ1 p, #FAQ2 p {
+        font-size: 16px;
+    }
+
+    #whatisthesubdomain h2 {
+        font-size: 16px;
+    }
+
+    #whatisthesubdomain p {
+        font-size: 12px;
+    }
+}
