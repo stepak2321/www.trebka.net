@@ -166,7 +166,3 @@ body, button, nav, section, footer {
 #theme-toggle i {
     margin-right: 8px;
 }
-
-.no-transition * {
-    transition: none !important;
-}
