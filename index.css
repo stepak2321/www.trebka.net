@@ -22,14 +22,14 @@
 /*mc.png*/
 
 #mcpng {
-    max-width: 100%;
+    max-width: 1200px;
     max-height: 500px;
     margin-bottom: 100px;
     padding: 30px;
     border-radius: 40px;
-    position: relative; /* Changed to relative to allow responsive positioning */
+    position: absolute;
     top: 230px;
-    left: 0;
+    left: 1550px;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -41,28 +41,28 @@
 /*subdomain.png*/
 
 #subdomainpng {
-    max-width: 100%;
+    max-width: 570px;
     max-height: 220px;
     margin-bottom: 100px;
     padding: 30px;
     border-radius: 40px;
-    position: relative;
+    position: absolute;
     top: 240px;
-    left: 0;
+    left: 10px;
     transition: transform 0.3s ease-in-out;
 }
 
 /*whatisthesubdomain*/
 
 #whatisthesubdomain {
-    max-width: 100%;
+    max-width: 300px;
     max-height: 500px;
     margin-bottom: 100px;
     padding: 30px;
     border-radius: 15px;
-    position: relative;
+    position: absolute;
     top: 450px;
-    left: 0;
+    left: 35px;
 }
 
 #whatisthesubdomain h2 {
@@ -81,20 +81,20 @@
     margin-bottom: 100px;
     padding: 30px;
     border-radius: 15px;
-    position: relative;
+    position: absolute;
     top: 100px;
-    left: 0;
+    left: 900px;
 }
 
 #FAQ1 {
-    width: 100%;
+    width: 500px;
     max-height: 500px;
     margin-bottom: 100px;
     padding: 30px;
     border-radius: 15px;
-    position: relative;
+    position: absolute;
     top: 100px;
-    left: 0;
+    left: 400px;
 }
 
 #FAQ1 p {
@@ -103,14 +103,14 @@
 }
 
 #FAQ2 {
-    width: 100%;
+    width: 500px;
     max-height: 500px;
     margin-bottom: 100px;
     padding: 30px;
     border-radius: 15px;
-    position: relative;
+    position: absolute;
     top: 100px;
-    left: 0;
+    left: 1000px;
 }
 
 #FAQ2 p {
@@ -137,12 +137,14 @@
         max-width: 100%;
         max-height: auto;
         margin-bottom: 50px;
+        left: 50%; /* Center images */
+        transform: translateX(-50%); /* Center horizontally */
     }
 
     #whatisthesubdomain {
-        max-width: 100%;
-        max-height: auto;
-        top: 350px;
+        max-width: 90%;
+        top: 450px;
+        left: 5%;
     }
 
     #FAQ, #FAQ1, #FAQ2 {
@@ -182,6 +184,8 @@
     #mcpng, #subdomainpng {
         max-width: 100%;
         max-height: auto;
+        left: 50%; /* Center images */
+        transform: translateX(-50%); /* Center horizontally */
     }
 
     #FAQ, #FAQ1, #FAQ2 {
