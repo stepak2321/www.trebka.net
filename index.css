@@ -1,11 +1,9 @@
-/* Reset základního stylu pro lepší kontrolu */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Základní styl pro stránku */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
@@ -20,14 +18,14 @@ header {
     color: #fff;
     text-align: center;
     padding: 20px;
-    position: relative; /* pro pozicování pohybujících se teček */
+    position: relative;
     overflow: hidden;
 }
 
 header h1 {
     font-size: 2.5rem;
     letter-spacing: 1px;
-    position: relative; /* Aby se titulek zobrazoval nad canvasem */
+    position: relative;
     z-index: 1;
 }
 
@@ -37,11 +35,10 @@ header h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* canvas bude pod textem */
-    pointer-events: none; /* Aby canvas neblokoval interakci s ostatními prvky */
+    z-index: 0;
+    pointer-events: none;
 }
 
-/* Navigační menu */
 nav {
     background-color: #2c3e50;
     text-align: center;
@@ -69,27 +66,90 @@ nav ul li a:hover {
     color: #3498db;
 }
 
-/* Sekce pro obsah */
-section {
+/*SEC*/
+
+/*HOME*/
+
+#home {
     max-width: 1200px;
     margin: 30px auto;
     padding: 30px;
-    background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-section h2 {
+#home h2 {
     font-size: 2rem;
     margin-bottom: 20px;
 }
 
-section p {
+#home p {
     font-size: 1.2rem;
     line-height: 1.8;
 }
 
-/* Tmavý režim */
+/*ABOUT*/
+
+
+#about {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#about h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#about p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+/*CONTACT*/
+
+
+#contact {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#contact h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#contact p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+/* menubox */
+
+#menubox {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#menubox h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+
+
+
+/*SEC*/
+
 body.dark-mode {
     background-color: #121212;
     color: #ccc;
@@ -116,7 +176,6 @@ body.dark-mode button:hover {
     background-color: #2980b9;
 }
 
-/* Patička stránky */
 footer {
     text-align: center;
     background-color: #2c3e50;
@@ -132,12 +191,14 @@ footer p {
     font-size: 1rem;
 }
 
-/* Plynulé přechody pro změnu režimu */
-body, button, nav, section, footer {
+body,
+button,
+nav,
+section,
+footer {
     transition: all 0.3s ease;
 }
 
-/* Styl pro tlačítko pro přepínání tématu */
 #theme-toggle {
     background-color: #3498db;
     color: #fff;
@@ -150,6 +211,7 @@ body, button, nav, section, footer {
     transition: background-color 0.3s ease, transform 0.3s ease;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     outline: none;
+    transform: scale(1.00);
 }
 
 #theme-toggle:hover {
@@ -162,7 +224,6 @@ body, button, nav, section, footer {
     transform: scale(0.98);
 }
 
-/* Styl pro ikonu v tlačítku (pokud bude použita) */
 #theme-toggle i {
     margin-right: 8px;
 }
