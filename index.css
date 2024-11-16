@@ -31,7 +31,6 @@
     top: 230px;
     left: 1550px;
     transition: transform 0.3s ease-in-out;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
 }
 
@@ -52,7 +51,6 @@
     top: 240px;
     left: 10px;
     transition: transform 0.3s ease-in-out;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
 }
 
@@ -89,7 +87,6 @@
     position: absolute;
     top: 100px;
     left: 900px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 #FAQ1 {
