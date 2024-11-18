@@ -1,213 +1,145 @@
-/*SEC*/
+/* Základní styl pro FAQ sekci */
+#FAQ {
+    margin: auto;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 24px;
+}
 
-/*ABOUT*/
+/* FAQ kontejner */
+#FAQs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 20px;
+    margin: auto;
+    margin-top: 20px;
+    width: 60%;
+    padding: 1.2%;
+    gap: 10px; /* Mezera mezi FAQ položkami */
+}
+
+/* Styl pro jednotlivé FAQ položky */
+#FAQ1, #FAQ2, #faq {
+    text-align: center;
+    border-radius: 10px;
+    white-space: nowrap;
+    font-size: 16px;
+}
+
+/* Pro separátor mezi FAQ */
+#faq {
+    font-size: 30px;
+    line-height: 1;
+}
+
+/* Responsivní úpravy pro různé velikosti obrazovek */
+
+/* Pro tablety (max-width: 768px) */
+@media (max-width: 768px) {
+    #FAQs {
+        flex-direction: row;  /* Položky budou vedle sebe */
+        width: 80%;  /* Zvětšení šířky FAQ containeru */
+    }
+
+    #FAQ1, #FAQ2, #faq {
+        width: auto; /* Neomezovat šířku jednotlivých položek */
+        font-size: 18px;  /* Zvýšení velikosti písma pro tablety */
+    }
+}
+
+/* Pro mobilní telefony (max-width: 480px) */
+@media (max-width: 480px) {
+    #FAQs {
+        width: 90%;  /* FAQ container na mobilu zabere 90% šířky */
+        flex-direction: column; /* Položky budou pod sebou */
+    }
+
+    #FAQ1, #FAQ2, #faq {
+        width: 100%; /* Na mobilu položky budou mít 100% šířky */
+        font-size: 14px;  /* Zmenšení písma na mobilních zařízeních */
+        text-align: center; /* Zarovnání textu na střed na mobilu */
+        margin-bottom: 10px; /* Mezery mezi položkami */
+    }
+
+    #faq {
+        font-size: 24px; /* Zvětšení svislé čáry | na mobilu */
+    }
+}
+
+/* Základní styl pro sekci About */
 #about {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border-radius: 20px;
+    margin: auto;
+    margin-top: 40px;
+    width: 60%;
+    padding: 1.2%;
 }
 
-#about h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-#about p {
-    font-size: 1.2rem;
-    line-height: 1.8;
-}
-
-/*mc.png*/
-
-#mcpng {
-    max-width: 1200px;
-    max-height: 500px;
-    margin-bottom: 100px;
-    padding: 30px;
-    border-radius: 40px;
-    position: absolute;
-    top: 230px;
-    left: 1550px;
-    transition: transform 0.3s ease-in-out;
-
-}
-
-#mcpng:active {
-    transform: scale(0.001);
-    transition: transform 0.5s ease-in-out;
-}
-
-/*subdomain.png*/
-
-#subdomainpng {
-    max-width: 570px;
-    max-height: 220px;
-    margin-bottom: 100px;
-    padding: 30px;
-    border-radius: 40px;
-    position: absolute;
-    top: 240px;
-    left: 10px;
-    transition: transform 0.3s ease-in-out;
-
-}
-
-/*whatisthesubdomain*/
-
+/* Základní styl pro sekci What is the subdomain */
 #whatisthesubdomain {
-    max-width: 300px;
-    max-height: 500px;
-    margin-bottom: 100px;
-    padding: 30px;
-    border-radius: 15px;
-    position: absolute;
-    top: 450px;
-    left: 35px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    margin: auto;
+    margin-top: 10px; /* Tato řádka přidá prostor 10px mezi #about a #whatisthesubdomain */
+    width: 60%; /* Stejná šířka jako #about */
+    padding: 0.2%;
+    display: flex;
+    align-items: flex-start;
+    text-align: left;
+    gap: 5px; /* Malý mezera mezi obrázkem a textem */
+}
+
+/* Obrázek subdomény */
+#subdomainpng {
+    border-radius: 20px;
+    width: 25%; /* Nastaví šířku obrázku */
+    margin: 0; /* Žádný okraj kolem obrázku */
+}
+
+/* Textová část pro #whatisthesubdomain */
+#whatisthesubdomain .text-content {
+    width: 70%; /* Zajišťuje, že textová část má dost místa */
+    display: inline-block;
+    flex-grow: 1;
 }
 
 #whatisthesubdomain h2 {
-    font-size: 20px;
+    margin: 0;
+    padding-bottom: 10px; /* Přidá prostor mezi nadpisem a odstavcem */
 }
 
 #whatisthesubdomain p {
-    font-size: 15px;
+    margin: 0;
 }
 
-/*FAQ*/
+/* Responsivní úpravy */
 
-#FAQ {
-    font-size: 10px;
-    text-align: center;
-    margin-bottom: 100px;
-    padding: 30px;
-    border-radius: 15px;
-    position: absolute;
-    top: 100px;
-    left: 900px;
-}
-
-#FAQ1 {
-    width: 500px;
-    max-height: 500px;
-    margin-bottom: 100px;
-    padding: 30px;
-    border-radius: 15px;
-    position: absolute;
-    top: 100px;
-    left: 400px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-#FAQ1 p {
-    font-size: 20px;
-    text-align: center;
-}
-
-#FAQ2 {
-    width: 500px;
-    max-height: 500px;
-    margin-bottom: 100px;
-    padding: 30px;
-    border-radius: 15px;
-    position: absolute;
-    top: 100px;
-    left: 1000px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-#FAQ2 p {
-    font-size: 20px;
-    text-align: center;
-}
-
-/* Mobile responsiveness */
-@media screen and (max-width: 768px) {
-    #about {
-        padding: 20px;
-        margin: 15px;
+/* Pro tablety (max-width: 768px) */
+@media (max-width: 768px) {
+    #subdomainpng {
+        width: 40%; /* Zvětšení šířky obrázku pro tablety */
     }
 
-    #about h2 {
-        font-size: 1.5rem;
+    #whatisthesubdomain .text-content {
+        width: 55%; /* Snížení šířky textu pro tablety */
     }
+}
 
-    #about p {
-        font-size: 1rem;
-    }
-
-    #mcpng, #subdomainpng {
-        max-width: 100%;
-        max-height: auto;
-        margin-bottom: 50px;
-        left: 50%; /* Center images */
-        transform: translateX(-50%); /* Center horizontally */
+/* Pro mobilní telefony (max-width: 480px) */
+@media (max-width: 480px) {
+    #subdomainpng {
+        width: 100%; /* Obrázek bude zabírat celou šířku na mobilních zařízeních */
+        margin: 0 auto; /* Zarovná obrázek na střed */
     }
 
     #whatisthesubdomain {
-        max-width: 90%;
-        top: 450px;
-        left: 5%;
+        flex-direction: column; /* Položky budou pod sebou */
     }
 
-    #FAQ, #FAQ1, #FAQ2 {
-        width: 90%;
-        left: 5%;
-        padding: 20px;
-    }
-
-    #FAQ1 p, #FAQ2 p {
-        font-size: 18px;
-    }
-
-    #whatisthesubdomain h2 {
-        font-size: 18px;
-    }
-
-    #whatisthesubdomain p {
-        font-size: 14px;
-    }
-}
-
-/* Extra small devices like mobile phones (portrait mode) */
-@media screen and (max-width: 480px) {
-    #about {
-        padding: 15px;
-        margin: 10px;
-    }
-
-    #about h2 {
-        font-size: 1.2rem;
-    }
-
-    #about p {
-        font-size: 0.9rem;
-    }
-
-    #mcpng, #subdomainpng {
-        max-width: 100%;
-        max-height: auto;
-        left: 50%; /* Center images */
-        transform: translateX(-50%); /* Center horizontally */
-    }
-
-    #FAQ, #FAQ1, #FAQ2 {
-        width: 90%;
-        left: 5%;
-        padding: 15px;
-    }
-
-    #FAQ1 p, #FAQ2 p {
-        font-size: 16px;
-    }
-
-    #whatisthesubdomain h2 {
-        font-size: 16px;
-    }
-
-    #whatisthesubdomain p {
-        font-size: 12px;
+    #whatisthesubdomain .text-content {
+        width: 100%; /* Text bude zabírat 100% šířky */
+        text-align: center; /* Text bude zarovnán na střed na mobilních zařízeních */
     }
 }
