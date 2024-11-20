@@ -37,40 +37,6 @@
     line-height: 1;
 }
 
-/* Responsivní úpravy pro různé velikosti obrazovek */
-
-/* Pro tablety (max-width: 768px) */
-@media (max-width: 768px) {
-    #FAQs {
-        flex-direction: row;  /* Položky budou vedle sebe */
-        width: 80%;  /* Zvětšení šířky FAQ containeru */
-    }
-
-    #FAQ1, #FAQ2, #faq {
-        width: auto; /* Neomezovat šířku jednotlivých položek */
-        font-size: 18px;  /* Zvýšení velikosti písma pro tablety */
-    }
-}
-
-/* Pro mobilní telefony (max-width: 480px) */
-@media (max-width: 480px) {
-    #FAQs {
-        width: 90%;  /* FAQ container na mobilu zabere 90% šířky */
-        flex-direction: column; /* Položky budou pod sebou */
-    }
-
-    #FAQ1, #FAQ2, #faq {
-        width: 100%; /* Na mobilu položky budou mít 100% šířky */
-        font-size: 14px;  /* Zmenšení písma na mobilních zařízeních */
-        text-align: center; /* Zarovnání textu na střed na mobilu */
-        margin-bottom: 10px; /* Mezery mezi položkami */
-    }
-
-    #faq {
-        font-size: 24px; /* Zvětšení svislé čáry | na mobilu */
-    }
-}
-
 /* Základní styl pro sekci About */
 #about {
     text-align: center;
@@ -86,8 +52,8 @@
 #whatisthesubdomain {
     border-radius: 20px;
     margin: auto;
-    margin-top: 40px; /* Zvýšená mezera mezi #about a #whatisthesubdomain */
-    width: 60%; /* Stejná šířka jako #about */
+    margin-top: 40px;
+    width: 60%;
     padding: 0.2%;
     display: flex;
     align-items: flex-start;
@@ -96,11 +62,7 @@
     box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 }
 
-#abouth2 {
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
-}
-
-#aboutp {
+#abouth2, #aboutp {
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
 }
 
@@ -129,10 +91,20 @@
     margin: 0;
 }
 
-/* Responsivní úpravy */
+/* Responsivní úpravy pro různé velikosti obrazovek */
 
 /* Pro tablety (max-width: 768px) */
 @media (max-width: 768px) {
+    #FAQs {
+        flex-direction: row;  /* Položky budou vedle sebe */
+        width: 80%;  /* Zvětšení šířky FAQ containeru */
+    }
+
+    #FAQ1, #FAQ2, #faq {
+        width: auto; /* Neomezovat šířku jednotlivých položek */
+        font-size: 18px;  /* Zvýšení velikosti písma pro tablety */
+    }
+
     #subdomainpng {
         width: 40%; /* Zvětšení šířky obrázku pro tablety */
     }
@@ -144,13 +116,28 @@
 
 /* Pro mobilní telefony (max-width: 480px) */
 @media (max-width: 480px) {
+    /* FAQ kontejner */
+    #FAQs, #about, #whatisthesubdomain {
+        width: 90%;  /* Nastaví šířku na 90% */
+        margin: 0 auto; /* Zarovná na střed */
+        flex-direction: column; /* Položky budou pod sebou */
+    }
+
+    #FAQ1, #FAQ2, #faq {
+        width: 100%; /* Na mobilu položky budou mít 100% šířky */
+        font-size: 14px;  /* Zmenšení písma na mobilních zařízeních */
+        text-align: center; /* Zarovnání textu na střed na mobilu */
+        margin-bottom: 10px; /* Mezery mezi položkami */
+    }
+
+    #faq {
+        font-size: 24px; /* Zvětšení svislé čáry | na mobilu */
+    }
+
+    /* Obrázek subdomény */
     #subdomainpng {
         width: 100%; /* Obrázek bude zabírat celou šířku na mobilních zařízeních */
         margin: 0 auto; /* Zarovná obrázek na střed */
-    }
-
-    #whatisthesubdomain {
-        flex-direction: column; /* Položky budou pod sebou */
     }
 
     #whatisthesubdomain .text-content {
