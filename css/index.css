@@ -28,7 +28,6 @@
     border-radius: 10px;
     white-space: nowrap;
     font-size: 16px;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
 }
 
 /* Pro separátor mezi FAQ */
@@ -60,10 +59,6 @@
     text-align: left;
     gap: 5px; /* Malý mezera mezi obrázkem a textem */
     box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
-}
-
-#abouth2, #aboutp {
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
 }
 
 /* Obrázek subdomény */
