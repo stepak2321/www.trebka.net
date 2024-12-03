@@ -72,13 +72,11 @@
     width: 70%; /* Zajišťuje, že textová část má dost místa */
     display: inline-block;
     flex-grow: 1;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
 }
 
 #whatisthesubdomain h2 {
     margin: 0;
-    padding-bottom: 10px; /* Přidá prostor mezi nadpisem a odstavcem */
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    padding-bottom: 10px; /* Přidá prostor mezi nadpisem a odstavcem */ 
 }
 
 #whatisthesubdomain p {
