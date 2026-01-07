@@ -567,6 +567,14 @@ function updateCanvas() {
 loadCircles();
 updateCanvas();
 
+// Handle window resize
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    // Recreate circles for new width
+    circles = [];
+    loadCircles();
+});
+
 /* ===================== FOOTER SECRET ===================== */
 const footer = document.querySelector('footer');
 let footerHoverCount = 0;
