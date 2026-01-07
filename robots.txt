@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://trebka.net/sitemap.xml
