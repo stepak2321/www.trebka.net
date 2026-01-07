@@ -30,7 +30,6 @@ body:not(.dark-mode) .card { background:rgba(0,0,0,0.04); border:1px solid rgba(
     51%, 100% { opacity: 0; }
 }
 
-.terminal { background:#050505; font-family:monospace; color:#7dff9b; font-size:0.85rem; }
 body:not(.dark-mode) .terminal { background:#f8f9fa; color:#2d3436; border:1px solid #ddd; }
 
 .system-info .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; font-family:monospace; font-size:0.85rem; }
