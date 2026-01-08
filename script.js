@@ -50,16 +50,16 @@ if (headerContent) {
 
     function updateClock() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
-            hour12: false, 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit' 
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
         });
-        const dateString = now.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
+        const dateString = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
         });
         clockElement.textContent = `${dateString} ${timeString}`;
     }
@@ -70,15 +70,15 @@ if (headerContent) {
 /* ===================== AUDIO MANAGEMENT ===================== */
 [hoverSound, secretSound, ambientSound].forEach(audio => {
     if (!audio) return;
-    audio.addEventListener('error', () => { 
-        console.warn('Audio failed to load:', audio.src); 
+    audio.addEventListener('error', () => {
+        console.warn('Audio failed to load:', audio.src);
     });
 });
 
 // Play ambient after first user gesture (required by many browsers)
 document.addEventListener('pointerdown', function startAmbient() {
     if (ambientSound && ambientSound.paused) {
-        ambientSound.play().catch(() => {});
+        ambientSound.play().catch(() => { });
     }
     document.removeEventListener('pointerdown', startAmbient);
 });
@@ -86,9 +86,9 @@ document.addEventListener('pointerdown', function startAmbient() {
 // Hover sounds
 document.querySelectorAll('button, .image-card').forEach(el => {
     el.addEventListener('mouseenter', () => {
-        if (hoverSound && hoverSound.readyState >= 2) { 
-            hoverSound.currentTime = 0; 
-            hoverSound.play().catch(() => {}); 
+        if (hoverSound && hoverSound.readyState >= 2) {
+            hoverSound.currentTime = 0;
+            hoverSound.play().catch(() => { });
         }
     });
 });
@@ -100,23 +100,23 @@ if (terminal) terminal.textContent = terminalLines.join('\n');
 function typeWriter(text, callback) {
     let i = 0;
     const interval = setInterval(() => {
-        if (i < text.length) { 
-            terminal.textContent += text.charAt(i); 
-            i++; 
-        } else { 
-            clearInterval(interval); 
-            if (callback) callback(); 
+        if (i < text.length) {
+            terminal.textContent += text.charAt(i);
+            i++;
+        } else {
+            clearInterval(interval);
+            if (callback) callback();
         }
     }, 30);
 }
 
 function log(msg, useTyping = false) {
     if (!terminal) return;
-    if (useTyping) { 
-        terminal.textContent += '\n'; 
-        typeWriter(`> ${msg}`); 
-    } else { 
-        terminal.textContent += `\n> ${msg}`; 
+    if (useTyping) {
+        terminal.textContent += '\n';
+        typeWriter(`> ${msg}`);
+    } else {
+        terminal.textContent += `\n> ${msg}`;
     }
     terminal.scrollTop = terminal.scrollHeight;
 }
@@ -135,12 +135,12 @@ function updateTerminalPrompt() {
 
 function processTerminalCommand() {
     if (!terminalInput || terminalInput.trim() === '') return;
-    
+
     const command = terminalInput.trim().toLowerCase();
     commandHistory.push(command);
     historyIndex = commandHistory.length;
     log(`> ${terminalInput}`, true);
-    
+
     setTimeout(() => {
         switch (command) {
             case 'help':
@@ -157,11 +157,11 @@ function processTerminalCommand() {
                 break;
             case 'matrix':
                 matrixEnabled = !matrixEnabled;
-                if (matrixEnabled) { 
-                    matrixRain = []; 
-                    log('matrix rain activated'); 
-                } else { 
-                    log('matrix rain deactivated'); 
+                if (matrixEnabled) {
+                    matrixRain = [];
+                    log('matrix rain activated');
+                } else {
+                    log('matrix rain deactivated');
                 }
                 break;
             case 'particles':
@@ -170,10 +170,10 @@ function processTerminalCommand() {
                 log(`particles ${particlesEnabled ? 'enabled' : 'disabled'}`);
                 break;
             case 'admin':
-                if (!adminMode) { 
-                    enableAdminMode(); 
-                } else { 
-                    log('admin mode already active'); 
+                if (!adminMode) {
+                    enableAdminMode();
+                } else {
+                    log('admin mode already active');
                 }
                 break;
             case 'ping':
@@ -191,36 +191,36 @@ function processTerminalCommand() {
                 log('usage: cat <filename>');
                 break;
             default:
-                if (command.startsWith('echo ')) { 
-                    log(command.substring(5)); 
+                if (command.startsWith('echo ')) {
+                    log(command.substring(5));
                 } else if (command.startsWith('cat ')) {
                     const filename = command.substring(4);
-                    if (filename === 'index.html') { 
-                        log('file contents: HTML document'); 
-                    } else if (filename === 'script.js') { 
-                        log('file contents: JavaScript code'); 
-                    } else if (filename === 'styles.css') { 
-                        log('file contents: CSS styles'); 
-                    } else { 
-                        log(`file not found: ${filename}`); 
+                    if (filename === 'index.html') {
+                        log('file contents: HTML document');
+                    } else if (filename === 'script.js') {
+                        log('file contents: JavaScript code');
+                    } else if (filename === 'styles.css') {
+                        log('file contents: CSS styles');
+                    } else {
+                        log(`file not found: ${filename}`);
                     }
-                } else { 
-                    log(`command not found: ${command}`); 
+                } else {
+                    log(`command not found: ${command}`);
                 }
                 break;
         }
     }, 400);
-    
+
     terminalInput = '';
     updateTerminalPrompt();
 }
 
 /* ===================== EASTER EGGS ===================== */
 // Image secret
-$id('imageSecret')?.addEventListener('click', () => { 
-    imageClicks++; 
-    log(`image ping ${imageClicks}`); 
-    if (imageClicks === 6 && !adminMode) enableAdminMode(); 
+$id('imageSecret')?.addEventListener('click', () => {
+    imageClicks++;
+    log(`image ping ${imageClicks}`);
+    if (imageClicks === 6 && !adminMode) enableAdminMode();
 });
 
 // Title easter egg
@@ -231,8 +231,8 @@ $id('titleEgg')?.addEventListener('click', () => {
         log('title override unlocked');
         document.title = 'ACCESS GRANTED';
         document.body.style.boxShadow = 'inset 0 0 120px rgba(0,255,150,0.15)';
-        setTimeout(() => { 
-            document.body.style.boxShadow = ''; 
+        setTimeout(() => {
+            document.body.style.boxShadow = '';
         }, 4000);
     }
 });
@@ -243,24 +243,24 @@ document.addEventListener('keydown', (e) => {
     if (secretCode.length > konamiCode.length) {
         secretCode = secretCode.slice(-konamiCode.length);
     }
-    if (secretCode === konamiCode) { 
-        activateEasterEgg(); 
-        secretCode = ''; 
+    if (secretCode === konamiCode) {
+        activateEasterEgg();
+        secretCode = '';
     }
 });
 
 function activateEasterEgg() {
     log('KONAMI CODE ACTIVATED');
     document.body.style.animation = 'rainbow 2s infinite';
-    setTimeout(() => { 
-        document.body.style.animation = ''; 
+    setTimeout(() => {
+        document.body.style.animation = '';
     }, 10000);
-    
-    if (!document.getElementById('konami-style')) { 
-        const style = document.createElement('style'); 
-        style.id = 'konami-style'; 
-        style.textContent = '@keyframes rainbow{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(360deg);}}'; 
-        document.head.appendChild(style); 
+
+    if (!document.getElementById('konami-style')) {
+        const style = document.createElement('style');
+        style.id = 'konami-style';
+        style.textContent = '@keyframes rainbow{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(360deg);}}';
+        document.head.appendChild(style);
     }
 }
 
@@ -269,24 +269,24 @@ document.addEventListener('keydown', (e) => {
     // Ctrl/Cmd + K: Clear terminal
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        if (terminal) { 
-            terminal.textContent = '> terminal cleared\n> ready for input'; 
-            log('terminal reset'); 
+        if (terminal) {
+            terminal.textContent = '> terminal cleared\n> ready for input';
+            log('terminal reset');
         }
     }
-    
+
     // Ctrl/Cmd + R: Toggle Matrix Rain
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
         e.preventDefault();
         matrixEnabled = !matrixEnabled;
-        if (matrixEnabled) { 
-            matrixRain = []; 
-            log('matrix rain activated'); 
-        } else { 
-            log('matrix rain deactivated'); 
+        if (matrixEnabled) {
+            matrixRain = [];
+            log('matrix rain activated');
+        } else {
+            log('matrix rain deactivated');
         }
     }
-    
+
     // Ctrl/Cmd + C: Clear canvas
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         e.preventDefault();
@@ -295,7 +295,7 @@ document.addEventListener('keydown', (e) => {
         loadCircles();
         log('canvas reset');
     }
-    
+
     // Ctrl/Cmd + P: Toggle particles
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
         e.preventDefault();
@@ -303,7 +303,7 @@ document.addEventListener('keydown', (e) => {
         if (!particlesEnabled) particles = [];
         log(`particles ${particlesEnabled ? 'enabled' : 'disabled'}`);
     }
-    
+
     // Space: Random status
     if (e.key === ' ' && document.activeElement === document.body) {
         e.preventDefault();
@@ -312,7 +312,7 @@ document.addEventListener('keydown', (e) => {
         }
         log('status randomized');
     }
-    
+
     // Enter: Process terminal command
     if (e.key === 'Enter' && document.activeElement === document.body) {
         e.preventDefault();
@@ -321,28 +321,28 @@ document.addEventListener('keydown', (e) => {
 
     // Terminal input capturing when body is focused
     if (document.activeElement === document.body) {
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { 
-            terminalInput += e.key; 
-            updateTerminalPrompt(); 
-        } else if (e.key === 'Backspace') { 
-            terminalInput = terminalInput.slice(0, -1); 
-            updateTerminalPrompt(); 
-        } else if (e.key === 'ArrowUp') { 
-            if (historyIndex > 0) { 
-                historyIndex--; 
-                terminalInput = commandHistory[historyIndex]; 
-                updateTerminalPrompt(); 
-            } 
-        } else if (e.key === 'ArrowDown') { 
-            if (historyIndex < commandHistory.length - 1) { 
-                historyIndex++; 
-                terminalInput = commandHistory[historyIndex]; 
-                updateTerminalPrompt(); 
-            } else { 
-                historyIndex = commandHistory.length; 
-                terminalInput = ''; 
-                updateTerminalPrompt(); 
-            } 
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            terminalInput += e.key;
+            updateTerminalPrompt();
+        } else if (e.key === 'Backspace') {
+            terminalInput = terminalInput.slice(0, -1);
+            updateTerminalPrompt();
+        } else if (e.key === 'ArrowUp') {
+            if (historyIndex > 0) {
+                historyIndex--;
+                terminalInput = commandHistory[historyIndex];
+                updateTerminalPrompt();
+            }
+        } else if (e.key === 'ArrowDown') {
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                terminalInput = commandHistory[historyIndex];
+                updateTerminalPrompt();
+            } else {
+                historyIndex = commandHistory.length;
+                terminalInput = '';
+                updateTerminalPrompt();
+            }
         }
     }
 });
@@ -353,7 +353,7 @@ function enableAdminMode() {
     adminMode = true;
     log('ADMIN MODE ENABLED');
     $id('secretOverlay').style.display = 'flex';
-    secretSound?.play().catch(() => {});
+    secretSound?.play().catch(() => { });
     startARG();
 }
 
@@ -364,7 +364,7 @@ $id('secretOverlay')?.addEventListener('click', () => {
 /* ===================== CANVAS ANIMATION ===================== */
 if (canvas) {
     canvas.width = window.innerWidth;
-    canvas.height = 130;
+    canvas.height = 260;
 }
 
 function createCircle() {
@@ -373,9 +373,9 @@ function createCircle() {
     const y = Math.random() * (canvas.height - radius * 2) + radius;
     let speedX = (Math.random() * 2 - 1) * 0.15;
     let speedY = (Math.random() * 2 - 1) * 0.15;
-    if (Math.random() > 0.8) { 
-        speedX *= 1.5; 
-        speedY *= 1.5; 
+    if (Math.random() > 0.8) {
+        speedX *= 1.5;
+        speedY *= 1.5;
     }
     circles.push({ x, y, radius, speedX, speedY });
 }
@@ -439,27 +439,33 @@ function loadCircles() {
     for (let i = 0; i < size; i++) createCircle();
 }
 
+const TICK_RATE = 1000 / 60;
+
+let nextTick = performance.now();
+
+function canvasTimer() {
+    const now = performance.now();
+
+    requestAnimationFrame(updateCanvas);
+    nextTick += TICK_RATE;
+
+    const delay = nextTick - performance.now();
+    setTimeout(canvasTimer, Math.max(0, delay));
+}
+
 function updateCanvas() {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Limit FPS
-    if (performance.now() - (updateCanvas.lastTime || 0) < 16) {
-        requestAnimationFrame(updateCanvas);
-        return;
-    }
-    updateCanvas.lastTime = performance.now();
-    
+
     if (particlesEnabled && !matrixEnabled) {
         updateParticles();
         drawParticles();
     }
-    
+
     if (!matrixEnabled) {
         // Draw circles and connections
-        hue = (hue + 0.3) % 360;
-        const color = "#ffffffff";
-        
+        const color = "#b6b6b6ff";
+
         for (const c of circles) {
             c.x += c.speedX;
             c.y += c.speedY;
@@ -470,7 +476,7 @@ function updateCanvas() {
             ctx.fillStyle = color;
             ctx.fill();
         }
-        
+
         // Draw connections
         for (let i = 0; i < circles.length; i++) {
             for (let j = i + 1; j < circles.length; j++) {
@@ -490,9 +496,9 @@ function updateCanvas() {
         // Matrix rain effect
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#0f0';
+        ctx.fillStyle = 'rgba(0, 211, 0, 1)';
         ctx.font = '14px monospace';
-        
+
         for (let i = matrixRain.length - 1; i >= 0; i--) {
             const drop = matrixRain[i];
             for (let j = 0; j < drop.chars.length; j++) {
@@ -509,12 +515,10 @@ function updateCanvas() {
         }
         if (Math.random() < 0.1) matrixRain.push(createMatrixDrop());
     }
-    
-    requestAnimationFrame(updateCanvas);
 }
 
 loadCircles();
-updateCanvas();
+canvasTimer();
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
@@ -566,7 +570,7 @@ setInterval(() => {
     const hours = Math.floor(elapsed / 3600000);
     const minutes = Math.floor((elapsed % 3600000) / 60000);
     const seconds = Math.floor((elapsed % 60000) / 1000);
-    $id('uptime-info').textContent = 
+    $id('uptime-info').textContent =
         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }, 1000);
 
@@ -683,7 +687,7 @@ function startARG() {
         "backup protocols engaged",
         "data stream active"
     ];
-    
+
     let idx = 0;
     const interval = setInterval(() => {
         if (idx < messages.length) {
