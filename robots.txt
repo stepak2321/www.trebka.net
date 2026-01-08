@@ -1,4 +1,5 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://circle-playground.trebka.net/sitemap.xml
+
+Sitemap: https://www.trebka.net/sitemap.xml
