@@ -1,5 +1,4 @@
 User-agent: *
 Disallow:
 
-
 Sitemap: https://www.trebka.net/sitemap.xml

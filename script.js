@@ -21,6 +21,12 @@ let idleTimer = 0;
 let mouseX = 0, mouseY = 0;
 let startTime = Date.now();
 
+// User customization
+let userName = 'anonymous';
+let terminalColor = '#7dff9b';
+let commandCount = 0;
+let secretsFound = 0;
+
 // Canvas state
 let circles = [];
 let matrixRain = [];
@@ -31,6 +37,11 @@ let hue = 0;
 const konamiCode = '38384040373937396665'; // up up down down left right left right b a
 const matrixChars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const states = ['monitoring', 'scanning', 'analyzing', 'observing', 'processing'];
+
+// Load saved data
+if (localStorage.getItem('userName')) userName = localStorage.getItem('userName');
+if (localStorage.getItem('commandCount')) commandCount = parseInt(localStorage.getItem('commandCount'));
+if (localStorage.getItem('secretsFound')) secretsFound = parseInt(localStorage.getItem('secretsFound'));
 
 /* ===================== DOM ELEMENTS ===================== */
 const terminal = $id('terminal');
@@ -50,16 +61,16 @@ if (headerContent) {
 
     function updateClock() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour12: false, 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
         });
-        const dateString = now.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
+        const dateString = now.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
         });
         clockElement.textContent = `${dateString} ${timeString}`;
     }
@@ -70,15 +81,15 @@ if (headerContent) {
 /* ===================== AUDIO MANAGEMENT ===================== */
 [hoverSound, secretSound, ambientSound].forEach(audio => {
     if (!audio) return;
-    audio.addEventListener('error', () => {
-        console.warn('Audio failed to load:', audio.src);
+    audio.addEventListener('error', () => { 
+        console.warn('Audio failed to load:', audio.src); 
     });
 });
 
 // Play ambient after first user gesture (required by many browsers)
 document.addEventListener('pointerdown', function startAmbient() {
     if (ambientSound && ambientSound.paused) {
-        ambientSound.play().catch(() => { });
+        ambientSound.play().catch(() => {});
     }
     document.removeEventListener('pointerdown', startAmbient);
 });
@@ -86,9 +97,9 @@ document.addEventListener('pointerdown', function startAmbient() {
 // Hover sounds
 document.querySelectorAll('button, .image-card').forEach(el => {
     el.addEventListener('mouseenter', () => {
-        if (hoverSound && hoverSound.readyState >= 2) {
-            hoverSound.currentTime = 0;
-            hoverSound.play().catch(() => { });
+        if (hoverSound && hoverSound.readyState >= 2) { 
+            hoverSound.currentTime = 0; 
+            hoverSound.play().catch(() => {}); 
         }
     });
 });
@@ -100,31 +111,57 @@ if (terminal) terminal.textContent = terminalLines.join('\n');
 function typeWriter(text, callback) {
     let i = 0;
     const interval = setInterval(() => {
-        if (i < text.length) {
-            terminal.textContent += text.charAt(i);
+        if (i < text.length) { 
+            terminal.textContent += text.charAt(i); 
             i++;
-        } else {
-            clearInterval(interval);
-            if (callback) callback();
+            // Auto-scroll while typing
+            terminal.scrollTop = terminal.scrollHeight;
+        } else { 
+            clearInterval(interval); 
+            // Final scroll after typing completes
+            terminal.scrollTop = terminal.scrollHeight;
+            if (callback) callback(); 
         }
     }, 30);
 }
 
 function log(msg, useTyping = false) {
     if (!terminal) return;
-    if (useTyping) {
-        terminal.textContent += '\n';
-        typeWriter(`> ${msg}`);
-    } else {
-        terminal.textContent += `\n> ${msg}`;
+    
+    // Remove current input line if it exists
+    const lines = terminal.textContent.split('\n');
+    const lastLine = lines[lines.length - 1];
+    if (lastLine.startsWith('> ') && terminalInput !== '') {
+        lines.pop();
+        terminal.textContent = lines.join('\n');
     }
-    terminal.scrollTop = terminal.scrollHeight;
+    
+    if (useTyping) { 
+        terminal.textContent += '\n'; 
+        typeWriter(`> ${msg}`, () => {
+            // Re-add input prompt after typing
+            if (terminalInput !== '') {
+                terminal.textContent += '\n> ' + terminalInput;
+            }
+            terminal.scrollTop = terminal.scrollHeight;
+        }); 
+    } else { 
+        terminal.textContent += `\n> ${msg}`; 
+        // Re-add input prompt
+        if (terminalInput !== '') {
+            terminal.textContent += '\n> ' + terminalInput;
+        }
+        terminal.scrollTop = terminal.scrollHeight;
+    }
 }
 
 function updateTerminalPrompt() {
     if (!terminal) return;
     const lines = terminal.textContent.split('\n');
-    if (lines[lines.length - 1].startsWith('> ')) {
+    const lastLine = lines[lines.length - 1];
+    
+    // Update or add the input line
+    if (lastLine.startsWith('> ')) {
         lines[lines.length - 1] = '> ' + terminalInput;
     } else {
         lines.push('> ' + terminalInput);
@@ -133,18 +170,61 @@ function updateTerminalPrompt() {
     terminal.scrollTop = terminal.scrollHeight;
 }
 
+function clearInputLine() {
+    if (!terminal) return;
+    const lines = terminal.textContent.split('\n');
+    const lastLine = lines[lines.length - 1];
+    if (lastLine.startsWith('> ')) {
+        lines.pop();
+        terminal.textContent = lines.join('\n');
+    }
+}
+
 function processTerminalCommand() {
-    if (!terminalInput || terminalInput.trim() === '') return;
-
+    if (!terminalInput || terminalInput.trim() === '') {
+        terminalInput = '';
+        return;
+    }
+    
     const command = terminalInput.trim().toLowerCase();
-    commandHistory.push(command);
-    historyIndex = commandHistory.length;
-    log(`> ${terminalInput}`, true);
-
+    const originalInput = terminalInput;
+    
+    // Clear the input line first
+    clearInputLine();
+    
+    // Add to history
+    if (command) {
+        commandHistory.push(command);
+        historyIndex = commandHistory.length;
+        commandCount++;
+        localStorage.setItem('commandCount', commandCount);
+    }
+    
+    // Log the command
+    terminal.textContent += `\n> ${originalInput}`;
+    terminal.scrollTop = terminal.scrollHeight;
+    
+    // Clear input
+    terminalInput = '';
+    
+    // Execute command
     setTimeout(() => {
-        switch (command) {
+        executeTerminalCommand(command);
+    }, 100);
+}
+
+function executeTerminalCommand(command) {
+    switch (command) {
             case 'help':
-                log('available commands: help, status, time, clear, matrix, particles, admin, ping, whoami, ls, cat, echo');
+                log('available commands:');
+                log('basic: help, status, time, date, clear, ping, whoami, ls, cat, echo, history');
+                log('calc: calc <expression> - e.g., calc 5+5');
+                log('encode: rot13 <text>, base64 <text>');
+                log('special: matrix, particles, admin, scan, trace, broadcast');
+                log('user: name <username>, color <green|amber|blue|red>, stats');
+                log('info: weather, uname, tree');
+                log('fun: joke, fortune, hack, coffee, dance, 42, glitch');
+                log('secret: try exploring... type "secret" for hints');
                 break;
             case 'status':
                 log(`current status: ${statusText ? statusText.textContent.replace('status: ', '') : 'monitoring'}`);
@@ -153,15 +233,17 @@ function processTerminalCommand() {
                 log(new Date().toLocaleString());
                 break;
             case 'clear':
-                if (terminal) terminal.textContent = '> terminal cleared\n> ready for input';
+                if (terminal) {
+                    terminal.textContent = '> terminal cleared';
+                }
                 break;
             case 'matrix':
                 matrixEnabled = !matrixEnabled;
-                if (matrixEnabled) {
-                    matrixRain = [];
-                    log('matrix rain activated');
-                } else {
-                    log('matrix rain deactivated');
+                if (matrixEnabled) { 
+                    matrixRain = []; 
+                    log('matrix rain activated'); 
+                } else { 
+                    log('matrix rain deactivated'); 
                 }
                 break;
             case 'particles':
@@ -170,18 +252,90 @@ function processTerminalCommand() {
                 log(`particles ${particlesEnabled ? 'enabled' : 'disabled'}`);
                 break;
             case 'admin':
-                if (!adminMode) {
-                    enableAdminMode();
-                } else {
-                    log('admin mode already active');
+                if (!adminMode) { 
+                    enableAdminMode(); 
+                } else { 
+                    log('admin mode already active'); 
                 }
                 break;
             case 'ping':
                 log('pong');
                 break;
             case 'whoami':
-                log('user: anonymous');
+                log(`user: ${userName}`);
                 log('level: observer');
+                break;
+            case 'history':
+                if (commandHistory.length === 0) {
+                    log('no command history');
+                } else {
+                    log('command history:');
+                    commandHistory.slice(-10).forEach((cmd, i) => {
+                        log(`${i + 1}. ${cmd}`);
+                    });
+                }
+                break;
+            case 'date':
+                const now = new Date();
+                log(now.toDateString());
+                log(now.toTimeString());
+                break;
+            case 'weather':
+                log('accessing weather satellite...');
+                setTimeout(() => {
+                    const conditions = ['acid rain', 'smog alert', 'electromagnetic storm', 'clear skies', 'neon fog'];
+                    const temp = Math.floor(Math.random() * 30 + 10);
+                    log(`condition: ${conditions[Math.floor(Math.random() * conditions.length)]}`);
+                    log(`temperature: ${temp}°C`);
+                    log(`radiation: nominal`);
+                }, 800);
+                break;
+            case 'uname':
+                log('trebka.net OS v2.077');
+                log('kernel: cyberpunk-5.19.0');
+                log('architecture: neural-x64');
+                break;
+            case 'tree':
+                log('.');
+                log('├── index.html');
+                log('├── script.js');
+                log('├── styles.css');
+                log('├── secrets/');
+                log('│   ├── classified.dat');
+                log('│   └── override.key');
+                log('└── system/');
+                log('    ├── core.bin');
+                log('    └── matrix.dll');
+                break;
+            case 'stats':
+                log('--- user statistics ---');
+                log(`username: ${userName}`);
+                log(`commands entered: ${commandCount}`);
+                log(`secrets found: ${secretsFound}/10`);
+                log(`session time: ${Math.floor((Date.now() - startTime) / 1000)}s`);
+                log(`admin mode: ${adminMode ? 'active' : 'inactive'}`);
+                break;
+            case 'trace':
+                log('initiating trace route...');
+                setTimeout(() => log('hop 1: 192.168.1.1 - 2ms'), 300);
+                setTimeout(() => log('hop 2: 10.0.0.1 - 15ms'), 600);
+                setTimeout(() => log('hop 3: 203.0.113.0 - 45ms'), 900);
+                setTimeout(() => log('hop 4: ??? - connection encrypted'), 1200);
+                setTimeout(() => log('trace complete - target masked'), 1500);
+                break;
+            case 'broadcast':
+                const broadcasts = [
+                    'ALERT: unauthorized access detected on node 7',
+                    'NOTICE: system maintenance in 3 hours',
+                    'WARNING: anomalous activity in sector 12',
+                    'INFO: neural link stability at 98%',
+                    'CRITICAL: firewall breach attempt blocked'
+                ];
+                log(broadcasts[Math.floor(Math.random() * broadcasts.length)]);
+                break;
+            case 'glitch':
+                triggerGlitch();
+                log('gl1tch_3ff3ct_@ct1v@t3d');
                 break;
             case 'ls':
                 log('files: index.html, script.js, styles.css');
@@ -190,37 +344,239 @@ function processTerminalCommand() {
             case 'cat':
                 log('usage: cat <filename>');
                 break;
+            case 'joke':
+                const jokes = [
+                    'Why do programmers prefer dark mode? Because light attracts bugs!',
+                    'How many programmers does it take to change a light bulb? None, that\'s a hardware problem.',
+                    'A SQL query walks into a bar, walks up to two tables and asks: "Can I join you?"',
+                    'Why do Java developers wear glasses? Because they don\'t C#!',
+                    'There are only 10 types of people: those who understand binary and those who don\'t.',
+                    'I would tell you a UDP joke, but you might not get it.',
+                    '"Knock knock." "Who\'s there?" ...very long pause... "Java."',
+                    'To understand what recursion is, you must first understand recursion.',
+                    'A programmer puts two glasses on the bedside table: one full of water for if they get thirsty, and one empty for if they don\'t.'
+                ];
+                log(jokes[Math.floor(Math.random() * jokes.length)]);
+                break;
+            case 'fortune':
+                const fortunes = [
+                    'Your code will compile on the first try... eventually.',
+                    'A bug in production is worth two in development.',
+                    'Today is a good day to refactor legacy code.',
+                    'You will find the solution in Stack Overflow.',
+                    'The next commit will be the one that works.',
+                    'Beware of infinite loops in unexpected places.',
+                    'Your algorithm has O(1) efficiency... in your dreams.',
+                    'The bug you\'re looking for is in the code you wrote yesterday.',
+                    'In production, no one can hear you scream.',
+                    'May your deployments be smooth and your rollbacks unnecessary.'
+                ];
+                log(fortunes[Math.floor(Math.random() * fortunes.length)]);
+                break;
+            case 'hack':
+                log('initializing hack sequence...');
+                setTimeout(() => log('accessing mainframe...'), 600);
+                setTimeout(() => log('bypassing firewall...'), 1200);
+                setTimeout(() => log('cracking encryption...'), 1800);
+                setTimeout(() => log('ERROR: Nice try, script kiddie!'), 2400);
+                break;
+            case 'sudo':
+                log('sudo: command not found (you\'re not root)');
+                break;
+            case 'rm -rf /':
+            case 'rm -rf':
+                log('permission denied: cannot delete the universe');
+                log('also, please don\'t do that');
+                break;
+            case 'exit':
+                log('you cannot leave. you are being observed.');
+                break;
+            case 'reboot':
+                log('rebooting system...');
+                setTimeout(() => location.reload(), 2000);
+                break;
+            case 'secret':
+                log('try: "unlock", "access", or "override"');
+                break;
+            case 'unlock':
+                log('access denied: insufficient privileges');
+                log('hint: click the image 6 times');
+                break;
+            case 'access':
+                log('authorization required');
+                log('hint: try the konami code');
+                break;
+            case 'override':
+                log('manual override initiated...');
+                if (!adminMode) {
+                    enableAdminMode();
+                    secretsFound = Math.max(secretsFound, 7);
+                    localStorage.setItem('secretsFound', secretsFound);
+                } else {
+                    log('admin mode already active');
+                }
+                break;
+            case 'coffee':
+                log('brewing coffee...');
+                setTimeout(() => log('☕ Error 418: I\'m a teapot'), 1000);
+                break;
+            case 'illuminati':
+                log('▲');
+                setTimeout(() => log('▲ ▲'), 300);
+                setTimeout(() => log('confirmed'), 600);
+                break;
+            case '42':
+                log('The Answer to the Ultimate Question of Life, the Universe, and Everything');
+                break;
+            case 'dance':
+                log('♪┏(°.°)┛┗(°.°)┓┗(°.°)┛┏(°.°)┓ ♪');
+                break;
+            case 'virus':
+                log('downloading virus.exe...');
+                setTimeout(() => log('just kidding! stay safe online :)'), 800);
+                break;
+            case 'matrix':
+                log('there is no spoon');
+                secretsFound = Math.max(secretsFound, 1);
+                localStorage.setItem('secretsFound', secretsFound);
+                break;
+            case 'noclip':
+                log('reality boundaries disabled');
+                document.body.style.transform = 'rotateZ(0.5deg)';
+                setTimeout(() => { document.body.style.transform = ''; }, 3000);
+                secretsFound = Math.max(secretsFound, 2);
+                localStorage.setItem('secretsFound', secretsFound);
+                break;
+            case 'ghost':
+                log('entering stealth mode...');
+                document.body.style.opacity = '0.3';
+                setTimeout(() => { document.body.style.opacity = '1'; }, 2000);
+                secretsFound = Math.max(secretsFound, 3);
+                localStorage.setItem('secretsFound', secretsFound);
+                break;
             default:
-                if (command.startsWith('echo ')) {
-                    log(command.substring(5));
+                if (command.startsWith('echo ')) { 
+                    log(command.substring(5)); 
+                } else if (command.startsWith('calc ')) {
+                    const expr = command.substring(5).trim();
+                    try {
+                        // Safe eval alternative - only allow numbers and basic operators
+                        const allowed = /^[0-9+\-*/().\s]+$/;
+                        if (allowed.test(expr)) {
+                            const result = Function('"use strict"; return (' + expr + ')')();
+                            log(`result: ${result}`);
+                        } else {
+                            log('error: invalid expression');
+                        }
+                    } catch (e) {
+                        log('error: calculation failed');
+                    }
+                } else if (command.startsWith('rot13 ')) {
+                    const text = command.substring(6);
+                    const result = text.replace(/[a-zA-Z]/g, c => 
+                        String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26)
+                    );
+                    log(`rot13: ${result}`);
+                } else if (command.startsWith('base64 ')) {
+                    const text = command.substring(7);
+                    try {
+                        const result = btoa(text);
+                        log(`base64: ${result}`);
+                    } catch (e) {
+                        log('error: encoding failed');
+                    }
+                } else if (command.startsWith('name ')) {
+                    const newName = command.substring(5).trim();
+                    if (newName.length > 0 && newName.length < 20) {
+                        userName = newName;
+                        localStorage.setItem('userName', userName);
+                        log(`username set to: ${userName}`);
+                    } else {
+                        log('error: invalid username');
+                    }
+                } else if (command.startsWith('color ')) {
+                    const color = command.substring(6).trim();
+                    const colors = {
+                        green: '#7dff9b',
+                        amber: '#ffb86c',
+                        blue: '#8be9fd',
+                        red: '#ff5555',
+                        purple: '#bd93f9'
+                    };
+                    if (colors[color]) {
+                        terminalColor = colors[color];
+                        if (terminal) terminal.style.color = terminalColor;
+                        log(`terminal color set to: ${color}`);
+                    } else {
+                        log('available colors: green, amber, blue, red, purple');
+                    }
                 } else if (command.startsWith('cat ')) {
                     const filename = command.substring(4);
-                    if (filename === 'index.html') {
-                        log('file contents: HTML document');
-                    } else if (filename === 'script.js') {
-                        log('file contents: JavaScript code');
-                    } else if (filename === 'styles.css') {
-                        log('file contents: CSS styles');
-                    } else {
-                        log(`file not found: ${filename}`);
+                    if (filename === 'index.html') { 
+                        log('file contents: HTML document'); 
+                    } else if (filename === 'script.js') { 
+                        log('file contents: JavaScript code'); 
+                    } else if (filename === 'styles.css') { 
+                        log('file contents: CSS styles'); 
+                    } else { 
+                        log(`file not found: ${filename}`); 
                     }
-                } else {
-                    log(`command not found: ${command}`);
+                } else if (command.startsWith('sudo ')) {
+                    log('sudo: you are not in the sudoers file. This incident will be reported.');
+                } else { 
+                    log(`command not found: ${command}`); 
+                    log('type "help" for available commands');
                 }
                 break;
         }
-    }, 400);
-
-    terminalInput = '';
-    updateTerminalPrompt();
 }
+
+/* ===================== VISUAL EFFECTS ===================== */
+function triggerGlitch() {
+    const glitchElement = document.body;
+    glitchElement.classList.add('glitch-effect');
+    setTimeout(() => glitchElement.classList.remove('glitch-effect'), 500);
+}
+
+function screenShake() {
+    const shakeElement = document.body;
+    shakeElement.style.animation = 'shake 0.5s';
+    setTimeout(() => { shakeElement.style.animation = ''; }, 500);
+}
+
+// Random system messages
+setInterval(() => {
+    if (Math.random() < 0.15) {
+        const messages = [
+            'background scan initiated...',
+            'packet inspection complete',
+            'neural sync: 99.8%',
+            'firewall status: active',
+            'intrusion detection: nominal',
+            'memory optimization complete'
+        ];
+        log(messages[Math.floor(Math.random() * messages.length)]);
+    }
+}, 15000);
+
+// Time-based easter eggs
+setInterval(() => {
+    const hour = new Date().getHours();
+    if (hour === 3 && Math.random() < 0.1) {
+        log('[SYSTEM] 3 AM - the witching hour...');
+    }
+}, 60000);
 
 /* ===================== EASTER EGGS ===================== */
 // Image secret
-$id('imageSecret')?.addEventListener('click', () => {
-    imageClicks++;
-    log(`image ping ${imageClicks}`);
-    if (imageClicks === 6 && !adminMode) enableAdminMode();
+$id('imageSecret')?.addEventListener('click', () => { 
+    imageClicks++; 
+    log(`image ping ${imageClicks}`); 
+    if (imageClicks === 6 && !adminMode) {
+        enableAdminMode();
+        secretsFound = Math.max(secretsFound, 4);
+        localStorage.setItem('secretsFound', secretsFound);
+    }
 });
 
 // Title easter egg
@@ -231,9 +587,11 @@ $id('titleEgg')?.addEventListener('click', () => {
         log('title override unlocked');
         document.title = 'ACCESS GRANTED';
         document.body.style.boxShadow = 'inset 0 0 120px rgba(0,255,150,0.15)';
-        setTimeout(() => {
-            document.body.style.boxShadow = '';
+        setTimeout(() => { 
+            document.body.style.boxShadow = ''; 
         }, 4000);
+        secretsFound = Math.max(secretsFound, 5);
+        localStorage.setItem('secretsFound', secretsFound);
     }
 });
 
@@ -243,24 +601,27 @@ document.addEventListener('keydown', (e) => {
     if (secretCode.length > konamiCode.length) {
         secretCode = secretCode.slice(-konamiCode.length);
     }
-    if (secretCode === konamiCode) {
-        activateEasterEgg();
-        secretCode = '';
+    if (secretCode === konamiCode) { 
+        activateEasterEgg(); 
+        secretCode = ''; 
     }
 });
 
 function activateEasterEgg() {
     log('KONAMI CODE ACTIVATED');
     document.body.style.animation = 'rainbow 2s infinite';
-    setTimeout(() => {
-        document.body.style.animation = '';
+    setTimeout(() => { 
+        document.body.style.animation = ''; 
     }, 10000);
-
-    if (!document.getElementById('konami-style')) {
-        const style = document.createElement('style');
-        style.id = 'konami-style';
-        style.textContent = '@keyframes rainbow{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(360deg);}}';
-        document.head.appendChild(style);
+    
+    secretsFound = Math.max(secretsFound, 6);
+    localStorage.setItem('secretsFound', secretsFound);
+    
+    if (!document.getElementById('konami-style')) { 
+        const style = document.createElement('style'); 
+        style.id = 'konami-style'; 
+        style.textContent = '@keyframes rainbow{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(360deg);}}'; 
+        document.head.appendChild(style); 
     }
 }
 
@@ -269,24 +630,23 @@ document.addEventListener('keydown', (e) => {
     // Ctrl/Cmd + K: Clear terminal
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        if (terminal) {
-            terminal.textContent = '> terminal cleared\n> ready for input';
-            log('terminal reset');
+        if (terminal) { 
+            terminal.textContent = '> terminal cleared'; 
         }
     }
-
+    
     // Ctrl/Cmd + R: Toggle Matrix Rain
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
         e.preventDefault();
         matrixEnabled = !matrixEnabled;
-        if (matrixEnabled) {
-            matrixRain = [];
-            log('matrix rain activated');
-        } else {
-            log('matrix rain deactivated');
+        if (matrixEnabled) { 
+            matrixRain = []; 
+            log('matrix rain activated'); 
+        } else { 
+            log('matrix rain deactivated'); 
         }
     }
-
+    
     // Ctrl/Cmd + C: Clear canvas
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         e.preventDefault();
@@ -295,7 +655,7 @@ document.addEventListener('keydown', (e) => {
         loadCircles();
         log('canvas reset');
     }
-
+    
     // Ctrl/Cmd + P: Toggle particles
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
         e.preventDefault();
@@ -303,16 +663,35 @@ document.addEventListener('keydown', (e) => {
         if (!particlesEnabled) particles = [];
         log(`particles ${particlesEnabled ? 'enabled' : 'disabled'}`);
     }
-
-    // Space: Random status
-    if (e.key === ' ' && document.activeElement === document.body) {
+    
+    // Ctrl/Cmd + G: Trigger glitch
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'g') {
+        e.preventDefault();
+        triggerGlitch();
+        log('glitch effect triggered');
+    }
+    
+    // Ctrl/Cmd + B: Random broadcast
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        const broadcasts = [
+            'ALERT: unauthorized access detected',
+            'NOTICE: system maintenance required',
+            'WARNING: anomalous activity detected',
+            'INFO: neural link stable'
+        ];
+        log(broadcasts[Math.floor(Math.random() * broadcasts.length)]);
+    }
+    
+    // Space: Random status (only when not typing in terminal)
+    if (e.key === ' ' && document.activeElement === document.body && terminalInput === '') {
         e.preventDefault();
         if (statusText) {
             statusText.textContent = 'status: ' + states[Math.floor(Math.random() * states.length)];
         }
         log('status randomized');
     }
-
+    
     // Enter: Process terminal command
     if (e.key === 'Enter' && document.activeElement === document.body) {
         e.preventDefault();
@@ -321,28 +700,55 @@ document.addEventListener('keydown', (e) => {
 
     // Terminal input capturing when body is focused
     if (document.activeElement === document.body) {
-        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-            terminalInput += e.key;
-            updateTerminalPrompt();
-        } else if (e.key === 'Backspace') {
-            terminalInput = terminalInput.slice(0, -1);
-            updateTerminalPrompt();
-        } else if (e.key === 'ArrowUp') {
-            if (historyIndex > 0) {
-                historyIndex--;
-                terminalInput = commandHistory[historyIndex];
-                updateTerminalPrompt();
-            }
-        } else if (e.key === 'ArrowDown') {
-            if (historyIndex < commandHistory.length - 1) {
-                historyIndex++;
-                terminalInput = commandHistory[historyIndex];
-                updateTerminalPrompt();
+        // Tab - Show command suggestions
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const commands = ['help', 'status', 'time', 'clear', 'ping', 'scan', 'calc', 'weather', 'stats', 
+                             'history', 'joke', 'fortune', 'hack', 'matrix', 'glitch', 'trace', 'broadcast'];
+            if (terminalInput.length > 0) {
+                const matches = commands.filter(cmd => cmd.startsWith(terminalInput.toLowerCase()));
+                if (matches.length > 0) {
+                    log(`suggestions: ${matches.join(', ')}`);
+                }
             } else {
-                historyIndex = commandHistory.length;
-                terminalInput = '';
+                log('press TAB for command suggestions');
+            }
+        }
+        // Regular character input
+        else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            e.preventDefault();
+            terminalInput += e.key; 
+            updateTerminalPrompt(); 
+        } 
+        // Backspace
+        else if (e.key === 'Backspace') {
+            e.preventDefault();
+            if (terminalInput.length > 0) {
+                terminalInput = terminalInput.slice(0, -1); 
                 updateTerminalPrompt();
             }
+        } 
+        // Arrow Up - Previous command
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (commandHistory.length > 0 && historyIndex > 0) { 
+                historyIndex--; 
+                terminalInput = commandHistory[historyIndex]; 
+                updateTerminalPrompt(); 
+            } 
+        } 
+        // Arrow Down - Next command
+        else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex < commandHistory.length - 1) { 
+                historyIndex++; 
+                terminalInput = commandHistory[historyIndex]; 
+                updateTerminalPrompt(); 
+            } else if (historyIndex >= commandHistory.length - 1) {
+                historyIndex = commandHistory.length; 
+                terminalInput = ''; 
+                updateTerminalPrompt(); 
+            } 
         }
     }
 });
@@ -353,7 +759,7 @@ function enableAdminMode() {
     adminMode = true;
     log('ADMIN MODE ENABLED');
     $id('secretOverlay').style.display = 'flex';
-    secretSound?.play().catch(() => { });
+    secretSound?.play().catch(() => {});
     startARG();
 }
 
@@ -364,7 +770,7 @@ $id('secretOverlay')?.addEventListener('click', () => {
 /* ===================== CANVAS ANIMATION ===================== */
 if (canvas) {
     canvas.width = window.innerWidth;
-    canvas.height = 260;
+    canvas.height = 130;
 }
 
 function createCircle() {
@@ -373,9 +779,9 @@ function createCircle() {
     const y = Math.random() * (canvas.height - radius * 2) + radius;
     let speedX = (Math.random() * 2 - 1) * 0.15;
     let speedY = (Math.random() * 2 - 1) * 0.15;
-    if (Math.random() > 0.8) {
-        speedX *= 1.5;
-        speedY *= 1.5;
+    if (Math.random() > 0.8) { 
+        speedX *= 1.5; 
+        speedY *= 1.5; 
     }
     circles.push({ x, y, radius, speedX, speedY });
 }
@@ -439,33 +845,27 @@ function loadCircles() {
     for (let i = 0; i < size; i++) createCircle();
 }
 
-const TICK_RATE = 1000 / 60;
-
-let nextTick = performance.now();
-
-function canvasTimer() {
-    const now = performance.now();
-
-    requestAnimationFrame(updateCanvas);
-    nextTick += TICK_RATE;
-
-    const delay = nextTick - performance.now();
-    setTimeout(canvasTimer, Math.max(0, delay));
-}
-
 function updateCanvas() {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    
+    // Limit FPS
+    if (performance.now() - (updateCanvas.lastTime || 0) < 16) {
+        requestAnimationFrame(updateCanvas);
+        return;
+    }
+    updateCanvas.lastTime = performance.now();
+    
     if (particlesEnabled && !matrixEnabled) {
         updateParticles();
         drawParticles();
     }
-
+    
     if (!matrixEnabled) {
         // Draw circles and connections
-        const color = "#b6b6b6ff";
-
+        hue = (hue + 0.3) % 360;
+        const color = "#ffffffff";
+        
         for (const c of circles) {
             c.x += c.speedX;
             c.y += c.speedY;
@@ -476,7 +876,7 @@ function updateCanvas() {
             ctx.fillStyle = color;
             ctx.fill();
         }
-
+        
         // Draw connections
         for (let i = 0; i < circles.length; i++) {
             for (let j = i + 1; j < circles.length; j++) {
@@ -496,9 +896,9 @@ function updateCanvas() {
         // Matrix rain effect
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(0, 211, 0, 1)';
+        ctx.fillStyle = '#0f0';
         ctx.font = '14px monospace';
-
+        
         for (let i = matrixRain.length - 1; i >= 0; i--) {
             const drop = matrixRain[i];
             for (let j = 0; j < drop.chars.length; j++) {
@@ -515,10 +915,12 @@ function updateCanvas() {
         }
         if (Math.random() < 0.1) matrixRain.push(createMatrixDrop());
     }
+    
+    requestAnimationFrame(updateCanvas);
 }
 
 loadCircles();
-canvasTimer();
+updateCanvas();
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
@@ -570,7 +972,7 @@ setInterval(() => {
     const hours = Math.floor(elapsed / 3600000);
     const minutes = Math.floor((elapsed % 3600000) / 60000);
     const seconds = Math.floor((elapsed % 60000) / 1000);
-    $id('uptime-info').textContent =
+    $id('uptime-info').textContent = 
         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }, 1000);
 
@@ -583,31 +985,28 @@ document.querySelectorAll('.cmd-btn').forEach(btn => {
 });
 
 function executeCommand(cmd) {
-    log(`executing: ${cmd}`, true);
+    terminalInput = cmd;
+    const displayCmd = terminalInput;
+    terminalInput = '';
+    
+    // Add to terminal display
+    const lines = terminal.textContent.split('\n');
+    const lastLine = lines[lines.length - 1];
+    if (lastLine.startsWith('> ') && lastLine.length === 2) {
+        lines[lines.length - 1] = '> ' + displayCmd;
+    } else {
+        lines.push('> ' + displayCmd);
+    }
+    terminal.textContent = lines.join('\n');
+    terminal.scrollTop = terminal.scrollHeight;
+    
+    // Execute after a short delay
     setTimeout(() => {
-        switch (cmd) {
-            case 'help':
-                log('available commands: help, status, clear, scan, ping');
-                break;
-            case 'status':
-                log(`current ${statusText ? statusText.textContent : 'status: monitoring'}`);
-                break;
-            case 'clear':
-                if (terminal) terminal.textContent = '> terminal cleared\n> ready for input';
-                break;
-            case 'scan':
-                log('scanning network...');
-                setTimeout(() => log('scan complete - no threats detected'), 1200);
-                break;
-            case 'ping':
-                log('pinging server...');
-                setTimeout(() => log('pong - latency: ' + Math.floor(Math.random() * 50 + 10) + 'ms'), 800);
-                break;
-        }
-    }, 300);
+        executeTerminalCommand(cmd);
+    }, 100);
 }
 
-/* ===================== FOOTER SECRET ===================== */
+// Footer secret
 const footer = document.querySelector('footer');
 let footerHoverCount = 0;
 
@@ -621,9 +1020,27 @@ if (footer) {
                 footer.style.color = '';
                 footerHoverCount = 0;
             }, 2000);
+            secretsFound = Math.max(secretsFound, 8);
+            localStorage.setItem('secretsFound', secretsFound);
         }
     });
 }
+
+// Achievement unlocks
+setInterval(() => {
+    if (commandCount === 50 && secretsFound < 9) {
+        log('🏆 ACHIEVEMENT UNLOCKED: Command Master');
+        secretsFound = Math.max(secretsFound, 9);
+        localStorage.setItem('secretsFound', secretsFound);
+    }
+    if (commandCount === 100 && secretsFound < 10) {
+        log('🏆 ACHIEVEMENT UNLOCKED: Terminal Legend');
+        log('You have unlocked all secrets!');
+        secretsFound = 10;
+        localStorage.setItem('secretsFound', secretsFound);
+        triggerGlitch();
+    }
+}, 1000);
 
 /* ===================== MOUSE TRACKING ===================== */
 document.addEventListener('mousemove', (e) => {
@@ -687,7 +1104,7 @@ function startARG() {
         "backup protocols engaged",
         "data stream active"
     ];
-
+    
     let idx = 0;
     const interval = setInterval(() => {
         if (idx < messages.length) {
