@@ -46,13 +46,13 @@
     <!-- Main Content -->
     <main>
         <!-- About Section -->
-        <section class="card">
+        <section class="card about-section">
             <h2>about</h2>
             <p>This site observes. It reacts. Nothing here is real.</p>
         </section>
 
         <!-- Update Log -->
-        <section class="card">
+        <section class="card update-log">
             <h2>update log</h2>
             <p class="log-entry">[2026-01-15] Added custom scrollbar styling for terminal</p>
             <p class="log-entry">[2026-01-15] Implemented auto-scrolling feature</p>
@@ -69,6 +69,17 @@
 
         <!-- Terminal -->
         <section class="card terminal">
+            <div class="terminal-header">
+                <div class="terminal-title">
+                    <span class="terminal-icon">▶</span>
+                    <span>terminal.exe</span>
+                </div>
+                <div class="terminal-controls">
+                    <span class="terminal-btn minimize">─</span>
+                    <span class="terminal-btn maximize">□</span>
+                    <span class="terminal-btn close">✕</span>
+                </div>
+            </div>
             <pre id="terminal">> system boot
 > integrity check ok
 > monitoring enabled</pre>

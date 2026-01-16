@@ -108,6 +108,12 @@ document.querySelectorAll('button, .image-card').forEach(el => {
 let terminalLines = ['> system boot', '> integrity check ok', '> monitoring enabled'];
 if (terminal) terminal.textContent = terminalLines.join('\n');
 
+// Auto-scroll helper function
+function autoScrollTerminal() {
+    if (!terminal) return;
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
 function typeWriter(text, callback) {
     let i = 0;
     const interval = setInterval(() => {
@@ -115,11 +121,11 @@ function typeWriter(text, callback) {
             terminal.textContent += text.charAt(i); 
             i++;
             // Auto-scroll while typing
-            terminal.scrollTop = terminal.scrollHeight;
+            autoScrollTerminal();
         } else { 
             clearInterval(interval); 
             // Final scroll after typing completes
-            terminal.scrollTop = terminal.scrollHeight;
+            autoScrollTerminal();
             if (callback) callback(); 
         }
     }, 30);
@@ -128,30 +134,14 @@ function typeWriter(text, callback) {
 function log(msg, useTyping = false) {
     if (!terminal) return;
     
-    // Remove current input line if it exists
-    const lines = terminal.textContent.split('\n');
-    const lastLine = lines[lines.length - 1];
-    if (lastLine.startsWith('> ') && terminalInput !== '') {
-        lines.pop();
-        terminal.textContent = lines.join('\n');
-    }
-    
     if (useTyping) { 
         terminal.textContent += '\n'; 
-        typeWriter(`> ${msg}`, () => {
-            // Re-add input prompt after typing
-            if (terminalInput !== '') {
-                terminal.textContent += '\n> ' + terminalInput;
-            }
-            terminal.scrollTop = terminal.scrollHeight;
+        typeWriter(msg, () => {
+            autoScrollTerminal();
         }); 
     } else { 
-        terminal.textContent += `\n> ${msg}`; 
-        // Re-add input prompt
-        if (terminalInput !== '') {
-            terminal.textContent += '\n> ' + terminalInput;
-        }
-        terminal.scrollTop = terminal.scrollHeight;
+        terminal.textContent += `\n${msg}`; 
+        autoScrollTerminal();
     }
 }
 
@@ -160,14 +150,15 @@ function updateTerminalPrompt() {
     const lines = terminal.textContent.split('\n');
     const lastLine = lines[lines.length - 1];
     
-    // Update or add the input line
-    if (lastLine.startsWith('> ')) {
-        lines[lines.length - 1] = '> ' + terminalInput;
+    // If we're starting to type and last line doesn't start with >, add new prompt line
+    if (!lastLine.startsWith('> ')) {
+        terminal.textContent += '\n> ' + terminalInput;
     } else {
-        lines.push('> ' + terminalInput);
+        // Update existing prompt line
+        lines[lines.length - 1] = '> ' + terminalInput;
+        terminal.textContent = lines.join('\n');
     }
-    terminal.textContent = lines.join('\n');
-    terminal.scrollTop = terminal.scrollHeight;
+    autoScrollTerminal();
 }
 
 function clearInputLine() {
@@ -189,9 +180,6 @@ function processTerminalCommand() {
     const command = terminalInput.trim().toLowerCase();
     const originalInput = terminalInput;
     
-    // Clear the input line first
-    clearInputLine();
-    
     // Add to history
     if (command) {
         commandHistory.push(command);
@@ -200,11 +188,7 @@ function processTerminalCommand() {
         localStorage.setItem('commandCount', commandCount);
     }
     
-    // Log the command
-    terminal.textContent += `\n> ${originalInput}`;
-    terminal.scrollTop = terminal.scrollHeight;
-    
-    // Clear input
+    // Clear input (the command line is already displayed by updateTerminalPrompt)
     terminalInput = '';
     
     // Execute command
@@ -847,7 +831,6 @@ function loadCircles() {
 
 function updateCanvas() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Limit FPS
     if (performance.now() - (updateCanvas.lastTime || 0) < 16) {
@@ -855,6 +838,8 @@ function updateCanvas() {
         return;
     }
     updateCanvas.lastTime = performance.now();
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     if (particlesEnabled && !matrixEnabled) {
         updateParticles();
@@ -927,6 +912,19 @@ window.addEventListener('resize', () => {
     circles = [];
     loadCircles();
     if (typeof updateSystemInfo === 'function') updateSystemInfo();
+});
+
+/* ===================== REMOVE HASH FROM URL ===================== */
+// Remove any hash from URL
+if (window.location.hash) {
+    history.replaceState(null, null, ' ');
+}
+
+// Prevent hash from being added
+window.addEventListener('hashchange', () => {
+    if (window.location.hash) {
+        history.replaceState(null, null, ' ');
+    }
 });
 
 /* ===================== SYSTEM INFO ===================== */

@@ -115,99 +115,227 @@ main {
 
 /* ===================== TERMINAL ===================== */
 .terminal {
-    background: #050505;
-    font-family: monospace;
+    background: linear-gradient(to bottom, #0a0a0a 0%, #050505 100%);
+    font-family: 'Courier New', monospace;
+    color: #7dff9b;
+    font-size: 0.9rem;
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(125, 255, 155, 0.2);
+    box-shadow: 0 0 20px rgba(125, 255, 155, 0.1);
+}
+
+.terminal-header {
+    background: linear-gradient(to bottom, #1a1a1a, #0f0f0f);
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(125, 255, 155, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #7dff9b;
     font-size: 0.85rem;
-    position: relative;
-    padding-bottom: 20px;
+    font-weight: 500;
+}
+
+.terminal-icon {
+    color: #7dff9b;
+    font-size: 0.75rem;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.7;
+}
+
+.terminal-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.terminal-btn.close {
+    background: #ff5f56;
+    color: #4a0000;
+}
+
+.terminal-btn.minimize {
+    background: #ffbd2e;
+    color: #5a3d00;
+}
+
+.terminal-btn.maximize {
+    background: #27c93f;
+    color: #003d0a;
+}
+
+#terminal {
+    padding: 16px;
+    margin: 0;
     white-space: pre-wrap;
     min-height: 150px;
-    overflow-y: auto;
     max-height: 300px;
+    overflow-y: auto;
     scroll-behavior: smooth;
+    line-height: 1.6;
+    text-shadow: 0 0 2px rgba(125, 255, 155, 0.3);
 }
 
 /* Custom Scrollbar for Terminal */
-.terminal::-webkit-scrollbar {
+#terminal::-webkit-scrollbar {
     width: 8px;
 }
 
-.terminal::-webkit-scrollbar-track {
+#terminal::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
 }
 
-.terminal::-webkit-scrollbar-thumb {
+#terminal::-webkit-scrollbar-thumb {
     background: #7dff9b;
     border-radius: 4px;
     transition: background 0.3s;
 }
 
-.terminal::-webkit-scrollbar-thumb:hover {
+#terminal::-webkit-scrollbar-thumb:hover {
     background: #9dffbb;
 }
 
 /* Firefox Scrollbar */
-.terminal {
+#terminal {
     scrollbar-width: thin;
     scrollbar-color: #7dff9b rgba(0, 0, 0, 0.3);
 }
 
-.terminal::after {
+#terminal::after {
     content: '█';
     animation: blink 1s infinite;
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
+    margin-left: 2px;
 }
 
 /* ===================== SYSTEM INFO ===================== */
+.system-info h2 {
+    color: #7dff9b;
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+}
+
 .system-info .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    font-family: monospace;
-    font-size: 0.85rem;
+    gap: 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.system-info .info-grid > div {
+    padding: 12px 14px;
+    background: rgba(125, 255, 155, 0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(125, 255, 155, 0.15);
+    transition: all 0.3s ease;
+}
+
+.system-info .info-grid > div:hover {
+    background: rgba(125, 255, 155, 0.08);
+    border-color: rgba(125, 255, 155, 0.3);
+    transform: translateX(3px);
 }
 
 .system-info .label {
     color: #7dff9b;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(125, 255, 155, 0.4);
 }
 
 /* ===================== COMMANDS ===================== */
+.commands h2 {
+    color: #7dff9b;
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+}
+
 .commands .command-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
 
 .cmd-btn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #e6e6e6;
-    padding: 6px 12px;
-    border-radius: 4px;
+    background: rgba(125, 255, 155, 0.06);
+    border: 1px solid rgba(125, 255, 155, 0.2);
+    color: #ffffff;
+    padding: 9px 16px;
+    border-radius: 6px;
     cursor: pointer;
-    font-family: monospace;
-    font-size: 0.8rem;
-    transition: background 0.2s, transform 0.1s;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 6px rgba(125, 255, 155, 0.3);
 }
 
 .cmd-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-1px);
+    background: rgba(125, 255, 155, 0.12);
+    border-color: rgba(125, 255, 155, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(125, 255, 155, 0.2);
 }
 
 .cmd-btn:active {
     transform: translateY(0);
 }
 
-/* ===================== LOG ENTRY ===================== */
+/* ===================== ABOUT SECTION ===================== */
+.about-section h2 {
+    color: #7dff9b;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+}
+
+/* ===================== UPDATE LOG ===================== */
+.update-log h2 {
+    color: #7dff9b;
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+}
+
 .log-entry {
-    opacity: 0.5;
-    font-family: monospace;
-    font-size: 0.8rem;
+    opacity: 0.75;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: bold;
+    padding: 8px 0 8px 14px;
+    margin: 8px 0;
+    background: rgba(125, 255, 155, 0.03);
+    border-left: 3px solid rgba(125, 255, 155, 0.4);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.log-entry:hover {
+    opacity: 1;
+    background: rgba(125, 255, 155, 0.06);
+    border-left-color: rgba(125, 255, 155, 0.7);
+    transform: translateX(4px);
 }
 
 /* ===================== SECRET OVERLAY ===================== */
