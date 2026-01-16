@@ -1,0 +1,373 @@
+/* =====================================================
+   trebka.net - Cyberpunk Interactive Experience
+   Organized CSS Styles
+   ===================================================== */
+
+/* ===================== BASE RESET ===================== */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    background: #0b0b0b;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, sans-serif;
+    background: #0b0b0b;
+    color: #e6e6e6;
+}
+
+/* ===================== HEADER ===================== */
+.header {
+    position: relative;
+    height: 260px;
+    overflow: hidden;
+    background: 
+        linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.85)), 
+        url("https://images.unsplash.com/photo-1495567720989-cebdbdd97913?auto=format&fit=crop&w=1600&q=80");
+    background-size: cover;
+    background-position: center;
+}
+
+.header h1 {
+    font-size: 3rem;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.header-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===================== CANVAS ===================== */
+#animationCanvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+/* ===================== MAIN LAYOUT ===================== */
+main {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 20px;
+    display: grid;
+    gap: 28px;
+    background: transparent;
+}
+
+/* ===================== CARDS ===================== */
+.card {
+    padding: 24px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+/* ===================== IMAGE CARD ===================== */
+.image-card {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.image-card img {
+    width: 100%;
+    display: block;
+    opacity: 0.95;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.image-card:hover img {
+    opacity: 1;
+    transform: scale(1.02);
+}
+
+.hint {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    font-family: monospace;
+}
+
+/* ===================== TERMINAL ===================== */
+.terminal {
+    background: #050505;
+    font-family: monospace;
+    color: #7dff9b;
+    font-size: 0.85rem;
+    position: relative;
+    padding-bottom: 20px;
+    white-space: pre-wrap;
+    min-height: 150px;
+    overflow-y: auto;
+    max-height: 300px;
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for Terminal */
+.terminal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.terminal::-webkit-scrollbar-thumb {
+    background: #7dff9b;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.terminal::-webkit-scrollbar-thumb:hover {
+    background: #9dffbb;
+}
+
+/* Firefox Scrollbar */
+.terminal {
+    scrollbar-width: thin;
+    scrollbar-color: #7dff9b rgba(0, 0, 0, 0.3);
+}
+
+.terminal::after {
+    content: '█';
+    animation: blink 1s infinite;
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+}
+
+/* ===================== SYSTEM INFO ===================== */
+.system-info .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.system-info .label {
+    color: #7dff9b;
+}
+
+/* ===================== COMMANDS ===================== */
+.commands .command-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cmd-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e6e6e6;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 0.8rem;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.cmd-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+.cmd-btn:active {
+    transform: translateY(0);
+}
+
+/* ===================== LOG ENTRY ===================== */
+.log-entry {
+    opacity: 0.5;
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+
+/* ===================== SECRET OVERLAY ===================== */
+#secretOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    cursor: pointer;
+}
+
+#secretOverlay p {
+    font-size: 1.8rem;
+    opacity: 0.85;
+    color: #7dff9b;
+    font-family: monospace;
+    text-shadow: 0 0 20px rgba(125, 255, 155, 0.5);
+}
+
+/* ===================== FOOTER ===================== */
+footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 24px;
+    opacity: 0.8;
+    font-size: 0.9rem;
+    background: transparent;
+}
+
+footer .dim {
+    opacity: 0.5;
+}
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+@keyframes rainbow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+/* Glitch Effect */
+.glitch-effect {
+    animation: glitch 0.3s infinite;
+}
+
+.glitch-effect::before,
+.glitch-effect::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.05) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 4px; }
+}
+
+/* ===================== CLOCK ===================== */
+#clockText {
+    opacity: 0.65;
+    font-size: 0.75rem;
+    margin: 4px 0 0 0;
+    font-family: monospace;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.5rem;
+    }
+    
+    main {
+        padding: 0 15px;
+        margin: 30px auto;
+    }
+    
+    .card {
+        padding: 16px;
+    }
+    
+    .system-info .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    footer {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    /* Touch-friendly command buttons */
+    .cmd-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        min-width: 80px;
+    }
+    
+    /* Better terminal on mobile */
+    .terminal {
+        max-height: 250px;
+        font-size: 0.8rem;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        height: 200px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .terminal {
+        font-size: 0.75rem;
+        max-height: 200px;
+    }
+    
+    /* Stack command buttons vertically on very small screens */
+    .commands .command-list {
+        flex-direction: column;
+    }
+    
+    .cmd-btn {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    /* Prevent zoom on input focus */
+    input, textarea, button {
+        font-size: 16px;
+    }
+}
