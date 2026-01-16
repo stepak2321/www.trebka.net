@@ -20,6 +20,14 @@ body {
     color: #e6e6e6;
 }
 
+/* Prevent transitions during initial load */
+body.no-transition *,
+body.no-transition *::before,
+body.no-transition *::after {
+    transition: none !important;
+    animation: none !important;
+}
+
 /* ===================== HEADER ===================== */
 .header {
     position: relative;
@@ -56,6 +64,21 @@ body {
     z-index: 0;
 }
 
+/* ===================== FOCUS STYLES FOR ACCESSIBILITY ===================== */
+*:focus {
+    outline: 2px solid #7dff9b;
+    outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 2px solid #7dff9b;
+    outline-offset: 2px;
+}
+
 /* ===================== MAIN LAYOUT ===================== */
 main {
     max-width: 900px;
@@ -73,6 +96,9 @@ main {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: transform 0.2s, box-shadow 0.2s;
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .card:hover {
@@ -166,9 +192,13 @@ main {
     cursor: pointer;
     transition: all 0.2s;
     opacity: 0.7;
+    border: none;
+    padding: 0;
+    line-height: 1;
 }
 
-.terminal-btn:hover {
+.terminal-btn:hover,
+.terminal-btn:focus {
     opacity: 1;
     transform: scale(1.1);
 }
@@ -431,6 +461,19 @@ footer .dim {
 }
 
 /* ===================== RESPONSIVE ===================== */
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 @media (max-width: 768px) {
     .header h1 {
         font-size: 2.5rem;
@@ -492,10 +535,45 @@ footer .dim {
     .cmd-btn {
         width: 100%;
         padding: 12px;
+        min-height: 44px; /* Minimum touch target size */
     }
     
     /* Prevent zoom on input focus */
     input, textarea, button {
         font-size: 16px;
+    }
+}
+
+/* Safe areas for notched devices */
+@supports (padding: env(safe-area-inset-left)) {
+    body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    footer {
+        padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    }
+}
+
+/* ===================== PRINT STYLES ===================== */
+@media print {
+    .header,
+    #animationCanvas,
+    .terminal,
+    .commands,
+    audio,
+    #secretOverlay {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .card {
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
     }
 }

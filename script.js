@@ -7,6 +7,22 @@
 function $(sel) { return document.querySelector(sel); }
 function $id(id) { return document.getElementById(id); }
 
+/* ===================== PAGE LOADER ===================== */
+window.addEventListener('load', () => {
+    const loader = $id('pageLoader');
+    if (loader) {
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            // Remove from DOM after transition
+            setTimeout(() => loader.remove(), 300);
+        }, 500);
+    }
+    // Remove no-transition class after load
+    setTimeout(() => {
+        document.body.classList.remove('no-transition');
+    }, 100);
+});
+
 /* ===================== GLOBAL STATE ===================== */
 let adminMode = false;
 let matrixEnabled = false;
@@ -39,9 +55,24 @@ const matrixChars = "アイウエオカキクケコサシスセソタチツテ�
 const states = ['monitoring', 'scanning', 'analyzing', 'observing', 'processing'];
 
 // Load saved data
-if (localStorage.getItem('userName')) userName = localStorage.getItem('userName');
-if (localStorage.getItem('commandCount')) commandCount = parseInt(localStorage.getItem('commandCount'));
-if (localStorage.getItem('secretsFound')) secretsFound = parseInt(localStorage.getItem('secretsFound'));
+try {
+    if (localStorage.getItem('userName')) userName = localStorage.getItem('userName');
+    if (localStorage.getItem('commandCount')) commandCount = parseInt(localStorage.getItem('commandCount')) || 0;
+    if (localStorage.getItem('secretsFound')) secretsFound = parseInt(localStorage.getItem('secretsFound')) || 0;
+} catch (e) {
+    console.warn('localStorage not available:', e);
+}
+
+// Safe localStorage wrapper
+function safeSetItem(key, value) {
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    } catch (e) {
+        console.warn('Failed to save to localStorage:', e);
+        return false;
+    }
+}
 
 /* ===================== DOM ELEMENTS ===================== */
 const terminal = $id('terminal');
@@ -52,6 +83,19 @@ const statusText = $id('statusText');
 const hoverSound = $id('hoverSound');
 const secretSound = $id('secretSound');
 const ambientSound = $id('ambientSound');
+
+/* ===================== ERROR HANDLING ===================== */
+// Global error handler
+window.addEventListener('error', (e) => {
+    console.error('Global error:', e.message);
+    return true; // Prevent default error handling
+});
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled promise rejection:', e.reason);
+    e.preventDefault();
+});
 
 /* ===================== CLOCK ===================== */
 if (headerContent) {
@@ -81,18 +125,29 @@ if (headerContent) {
 /* ===================== AUDIO MANAGEMENT ===================== */
 [hoverSound, secretSound, ambientSound].forEach(audio => {
     if (!audio) return;
-    audio.addEventListener('error', () => { 
-        console.warn('Audio failed to load:', audio.src); 
+    audio.addEventListener('error', (e) => { 
+        console.warn('Audio failed to load:', audio.src, e); 
+    });
+    // Prevent audio from blocking page load
+    audio.addEventListener('loadstart', () => {
+        audio.volume = 0.3; // Set reasonable default volume
     });
 });
 
 // Play ambient after first user gesture (required by many browsers)
-document.addEventListener('pointerdown', function startAmbient() {
+let audioInitialized = false;
+function initAudio() {
+    if (audioInitialized) return;
+    audioInitialized = true;
     if (ambientSound && ambientSound.paused) {
-        ambientSound.play().catch(() => {});
+        ambientSound.play().catch(() => {
+            console.log('Ambient audio play blocked by browser');
+        });
     }
-    document.removeEventListener('pointerdown', startAmbient);
-});
+}
+
+document.addEventListener('pointerdown', initAudio, { once: true });
+document.addEventListener('keydown', initAudio, { once: true });
 
 // Hover sounds
 document.querySelectorAll('button, .image-card').forEach(el => {
@@ -185,7 +240,7 @@ function processTerminalCommand() {
         commandHistory.push(command);
         historyIndex = commandHistory.length;
         commandCount++;
-        localStorage.setItem('commandCount', commandCount);
+        safeSetItem('commandCount', commandCount);
     }
     
     // Clear input (the command line is already displayed by updateTerminalPrompt)
@@ -395,7 +450,7 @@ function executeTerminalCommand(command) {
                 if (!adminMode) {
                     enableAdminMode();
                     secretsFound = Math.max(secretsFound, 7);
-                    localStorage.setItem('secretsFound', secretsFound);
+                    safeSetItem('secretsFound', secretsFound);
                 } else {
                     log('admin mode already active');
                 }
@@ -422,21 +477,21 @@ function executeTerminalCommand(command) {
             case 'matrix':
                 log('there is no spoon');
                 secretsFound = Math.max(secretsFound, 1);
-                localStorage.setItem('secretsFound', secretsFound);
+                safeSetItem('secretsFound', secretsFound);
                 break;
             case 'noclip':
                 log('reality boundaries disabled');
                 document.body.style.transform = 'rotateZ(0.5deg)';
                 setTimeout(() => { document.body.style.transform = ''; }, 3000);
                 secretsFound = Math.max(secretsFound, 2);
-                localStorage.setItem('secretsFound', secretsFound);
+                safeSetItem('secretsFound', secretsFound);
                 break;
             case 'ghost':
                 log('entering stealth mode...');
                 document.body.style.opacity = '0.3';
                 setTimeout(() => { document.body.style.opacity = '1'; }, 2000);
                 secretsFound = Math.max(secretsFound, 3);
-                localStorage.setItem('secretsFound', secretsFound);
+                safeSetItem('secretsFound', secretsFound);
                 break;
             default:
                 if (command.startsWith('echo ')) { 
@@ -446,14 +501,20 @@ function executeTerminalCommand(command) {
                     try {
                         // Safe eval alternative - only allow numbers and basic operators
                         const allowed = /^[0-9+\-*/().\s]+$/;
-                        if (allowed.test(expr)) {
-                            const result = Function('"use strict"; return (' + expr + ')')();
-                            log(`result: ${result}`);
+                        if (allowed.test(expr) && expr.length < 100) {
+                            // Use safer evaluation
+                            const result = new Function('"use strict"; return (' + expr.replace(/[^0-9+\-*/().\s]/g, '') + ')')();
+                            if (isFinite(result)) {
+                                log(`result: ${result}`);
+                            } else {
+                                log('error: result is not a finite number');
+                            }
                         } else {
-                            log('error: invalid expression');
+                            log('error: invalid expression (use numbers and +, -, *, /, () only)');
                         }
                     } catch (e) {
                         log('error: calculation failed');
+                        console.error('Calc error:', e);
                     }
                 } else if (command.startsWith('rot13 ')) {
                     const text = command.substring(6);
@@ -464,19 +525,27 @@ function executeTerminalCommand(command) {
                 } else if (command.startsWith('base64 ')) {
                     const text = command.substring(7);
                     try {
-                        const result = btoa(text);
-                        log(`base64: ${result}`);
+                        // Limit input length to prevent memory issues
+                        if (text.length > 1000) {
+                            log('error: input too long (max 1000 characters)');
+                        } else {
+                            const result = btoa(unescape(encodeURIComponent(text)));
+                            log(`base64: ${result}`);
+                        }
                     } catch (e) {
-                        log('error: encoding failed');
+                        log('error: encoding failed - check for invalid characters');
+                        console.error('Base64 error:', e);
                     }
                 } else if (command.startsWith('name ')) {
                     const newName = command.substring(5).trim();
-                    if (newName.length > 0 && newName.length < 20) {
-                        userName = newName;
-                        localStorage.setItem('userName', userName);
+                    // Sanitize input: remove HTML and limit length
+                    const sanitized = newName.replace(/[<>"'&]/g, '').substring(0, 20);
+                    if (sanitized.length > 0 && /^[a-zA-Z0-9_\-\s]+$/.test(sanitized)) {
+                        userName = sanitized;
+                        safeSetItem('userName', userName);
                         log(`username set to: ${userName}`);
                     } else {
-                        log('error: invalid username');
+                        log('error: invalid username (alphanumeric only)');
                     }
                 } else if (command.startsWith('color ')) {
                     const color = command.substring(6).trim();
@@ -559,7 +628,7 @@ $id('imageSecret')?.addEventListener('click', () => {
     if (imageClicks === 6 && !adminMode) {
         enableAdminMode();
         secretsFound = Math.max(secretsFound, 4);
-        localStorage.setItem('secretsFound', secretsFound);
+        safeSetItem('secretsFound', secretsFound);
     }
 });
 
@@ -575,7 +644,7 @@ $id('titleEgg')?.addEventListener('click', () => {
             document.body.style.boxShadow = ''; 
         }, 4000);
         secretsFound = Math.max(secretsFound, 5);
-        localStorage.setItem('secretsFound', secretsFound);
+        safeSetItem('secretsFound', secretsFound);
     }
 });
 
@@ -599,7 +668,7 @@ function activateEasterEgg() {
     }, 10000);
     
     secretsFound = Math.max(secretsFound, 6);
-    localStorage.setItem('secretsFound', secretsFound);
+    safeSetItem('secretsFound', secretsFound);
     
     if (!document.getElementById('konami-style')) { 
         const style = document.createElement('style'); 
@@ -752,9 +821,15 @@ $id('secretOverlay')?.addEventListener('click', () => {
 });
 
 /* ===================== CANVAS ANIMATION ===================== */
-if (canvas) {
-    canvas.width = window.innerWidth;
-    canvas.height = 130;
+if (canvas && ctx) {
+    try {
+        canvas.width = Math.min(window.innerWidth, 2560); // Limit for performance
+        canvas.height = 130;
+    } catch (e) {
+        console.error('Canvas initialization failed:', e);
+    }
+} else {
+    console.warn('Canvas not supported or failed to initialize');
 }
 
 function createCircle() {
@@ -907,12 +982,27 @@ function updateCanvas() {
 loadCircles();
 updateCanvas();
 
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    circles = [];
-    loadCircles();
-    if (typeof updateSystemInfo === 'function') updateSystemInfo();
-});
+// Debounce helper
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+window.addEventListener('resize', debounce(() => {
+    if (canvas && ctx) {
+        canvas.width = Math.min(window.innerWidth, 2560);
+        circles = [];
+        loadCircles();
+        if (typeof updateSystemInfo === 'function') updateSystemInfo();
+    }
+}, 250));
 
 /* ===================== REMOVE HASH FROM URL ===================== */
 // Remove any hash from URL
@@ -959,9 +1049,17 @@ function updateSystemInfo() {
 
 // Initialize system info
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateSystemInfo);
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSystemInfo();
+        // Update footer year
+        const yearEl = $id('currentYear');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+    });
 } else {
     updateSystemInfo();
+    // Update footer year
+    const yearEl = $id('currentYear');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 }
 
 // Uptime counter
@@ -1019,7 +1117,7 @@ if (footer) {
                 footerHoverCount = 0;
             }, 2000);
             secretsFound = Math.max(secretsFound, 8);
-            localStorage.setItem('secretsFound', secretsFound);
+            safeSetItem('secretsFound', secretsFound);
         }
     });
 }
@@ -1029,13 +1127,13 @@ setInterval(() => {
     if (commandCount === 50 && secretsFound < 9) {
         log('🏆 ACHIEVEMENT UNLOCKED: Command Master');
         secretsFound = Math.max(secretsFound, 9);
-        localStorage.setItem('secretsFound', secretsFound);
+        safeSetItem('secretsFound', secretsFound);
     }
     if (commandCount === 100 && secretsFound < 10) {
         log('🏆 ACHIEVEMENT UNLOCKED: Terminal Legend');
         log('You have unlocked all secrets!');
         secretsFound = 10;
-        localStorage.setItem('secretsFound', secretsFound);
+        safeSetItem('secretsFound', secretsFound);
         triggerGlitch();
     }
 }, 1000);
