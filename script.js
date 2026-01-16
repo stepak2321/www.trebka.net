@@ -7,22 +7,6 @@
 function $(sel) { return document.querySelector(sel); }
 function $id(id) { return document.getElementById(id); }
 
-/* ===================== PAGE LOADER ===================== */
-window.addEventListener('load', () => {
-    const loader = $id('pageLoader');
-    if (loader) {
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            // Remove from DOM after transition
-            setTimeout(() => loader.remove(), 300);
-        }, 500);
-    }
-    // Remove no-transition class after load
-    setTimeout(() => {
-        document.body.classList.remove('no-transition');
-    }, 100);
-});
-
 /* ===================== GLOBAL STATE ===================== */
 let adminMode = false;
 let matrixEnabled = false;
