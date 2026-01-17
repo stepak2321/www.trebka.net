@@ -9,7 +9,6 @@ function $id(id) { return document.getElementById(id); }
 
 /* ===================== GLOBAL STATE ===================== */
 let adminMode = false;
-let matrixEnabled = false;
 let particlesEnabled = true;
 let terminalInput = '';
 let commandHistory = [];
@@ -23,19 +22,17 @@ let startTime = Date.now();
 
 // User customization
 let userName = 'anonymous';
-let terminalColor = '#7dff9b';
+let terminalColor = '#d4d4d4';
 let commandCount = 0;
 let secretsFound = 0;
 
 // Canvas state
 let circles = [];
-let matrixRain = [];
 let particles = [];
 let hue = 0;
 
 // Constants
 const konamiCode = '38384040373937396665'; // up up down down left right left right b a
-const matrixChars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const states = ['monitoring', 'scanning', 'analyzing', 'observing', 'processing'];
 
 // Load saved data
@@ -44,7 +41,10 @@ if (localStorage.getItem('commandCount')) commandCount = parseInt(localStorage.g
 if (localStorage.getItem('secretsFound')) secretsFound = parseInt(localStorage.getItem('secretsFound'));
 
 /* ===================== DOM ELEMENTS ===================== */
-const terminal = $id('terminal');
+const terminal = $id('terminalOutput');
+const terminalInputField = $id('terminalInput');
+const clearTerminalBtn = $id('clearTerminal');
+const minimizeTerminalBtn = $id('minimizeTerminal');
 const canvas = $id('animationCanvas');
 const ctx = canvas?.getContext ? canvas.getContext('2d') : null;
 const headerContent = $('.header-content');
@@ -105,8 +105,106 @@ document.querySelectorAll('button, .image-card').forEach(el => {
 });
 
 /* ===================== TERMINAL ===================== */
-let terminalLines = ['> system boot', '> integrity check ok', '> monitoring enabled'];
+let terminalLines = ['Last login: Fri Jan 17 2026 on tty1', '> system boot', '> integrity check ok', '> monitoring enabled'];
 if (terminal) terminal.textContent = terminalLines.join('\n');
+
+// Terminal input field event handlers
+if (terminalInputField) {
+    // Handle Enter key to submit command
+    terminalInputField.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const command = terminalInputField.value.trim();
+            if (command) {
+                // Add to terminal display
+                terminal.textContent += `\n> ${command}`;
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                // Add to history
+                commandHistory.push(command);
+                historyIndex = commandHistory.length;
+                commandCount++;
+                localStorage.setItem('commandCount', commandCount);
+                
+                // Clear input
+                terminalInputField.value = '';
+                
+                // Execute command
+                setTimeout(() => {
+                    executeTerminalCommand(command.toLowerCase());
+                }, 100);
+            }
+        }
+        // Arrow up - previous command
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (commandHistory.length > 0 && historyIndex > 0) {
+                historyIndex--;
+                terminalInputField.value = commandHistory[historyIndex];
+            }
+        }
+        // Arrow down - next command
+        else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                terminalInputField.value = commandHistory[historyIndex];
+            } else {
+                historyIndex = commandHistory.length;
+                terminalInputField.value = '';
+            }
+        }
+        // Tab - autocomplete
+        else if (e.key === 'Tab') {
+            e.preventDefault();
+            const input = terminalInputField.value.toLowerCase();
+            const commands = ['help', 'status', 'time', 'date', 'clear', 'ping', 'whoami', 'history', 
+                            'weather', 'stats', 'particles', 'admin', 'scan', 'trace', 
+                            'broadcast', 'glitch', 'joke', 'fortune', 'hack', 'uname', 'tree', 
+                            'calc', 'echo', 'rot13', 'base64', 'name', 'color', 'secret'];
+            const matches = commands.filter(cmd => cmd.startsWith(input));
+            if (matches.length === 1) {
+                terminalInputField.value = matches[0];
+            } else if (matches.length > 1) {
+                log(`suggestions: ${matches.join(', ')}`);
+            }
+        }
+    });
+    
+    // Focus input on page load
+    terminalInputField.focus();
+    
+    // Refocus input when clicking terminal output
+    if (terminal) {
+        terminal.addEventListener('click', () => {
+            terminalInputField.focus();
+        });
+    }
+}
+
+// Terminal control buttons
+if (clearTerminalBtn) {
+    clearTerminalBtn.addEventListener('click', () => {
+        if (terminal) {
+            terminal.textContent = '> terminal cleared';
+        }
+        if (terminalInputField) {
+            terminalInputField.focus();
+        }
+    });
+}
+
+if (minimizeTerminalBtn) {
+    minimizeTerminalBtn.addEventListener('click', () => {
+        const terminalOutput = $id('terminalOutput');
+        const inputLine = $('.terminal-input-line');
+        if (terminalOutput && inputLine) {
+            terminalOutput.classList.toggle('minimized');
+            inputLine.classList.toggle('minimized');
+            minimizeTerminalBtn.textContent = terminalOutput.classList.contains('minimized') ? '+' : '─';
+        }
+    });
+}
 
 function typeWriter(text, callback) {
     let i = 0;
@@ -128,103 +226,29 @@ function typeWriter(text, callback) {
 function log(msg, useTyping = false) {
     if (!terminal) return;
     
-    // Remove current input line if it exists
-    const lines = terminal.textContent.split('\n');
-    const lastLine = lines[lines.length - 1];
-    if (lastLine.startsWith('> ') && terminalInput !== '') {
-        lines.pop();
-        terminal.textContent = lines.join('\n');
-    }
-    
     if (useTyping) { 
         terminal.textContent += '\n'; 
-        typeWriter(`> ${msg}`, () => {
-            // Re-add input prompt after typing
-            if (terminalInput !== '') {
-                terminal.textContent += '\n> ' + terminalInput;
-            }
+        typeWriter(msg, () => {
             terminal.scrollTop = terminal.scrollHeight;
         }); 
     } else { 
-        terminal.textContent += `\n> ${msg}`; 
-        // Re-add input prompt
-        if (terminalInput !== '') {
-            terminal.textContent += '\n> ' + terminalInput;
-        }
+        terminal.textContent += `\n${msg}`; 
         terminal.scrollTop = terminal.scrollHeight;
     }
-}
-
-function updateTerminalPrompt() {
-    if (!terminal) return;
-    const lines = terminal.textContent.split('\n');
-    const lastLine = lines[lines.length - 1];
-    
-    // Update or add the input line
-    if (lastLine.startsWith('> ')) {
-        lines[lines.length - 1] = '> ' + terminalInput;
-    } else {
-        lines.push('> ' + terminalInput);
-    }
-    terminal.textContent = lines.join('\n');
-    terminal.scrollTop = terminal.scrollHeight;
-}
-
-function clearInputLine() {
-    if (!terminal) return;
-    const lines = terminal.textContent.split('\n');
-    const lastLine = lines[lines.length - 1];
-    if (lastLine.startsWith('> ')) {
-        lines.pop();
-        terminal.textContent = lines.join('\n');
-    }
-}
-
-function processTerminalCommand() {
-    if (!terminalInput || terminalInput.trim() === '') {
-        terminalInput = '';
-        return;
-    }
-    
-    const command = terminalInput.trim().toLowerCase();
-    const originalInput = terminalInput;
-    
-    // Clear the input line first
-    clearInputLine();
-    
-    // Add to history
-    if (command) {
-        commandHistory.push(command);
-        historyIndex = commandHistory.length;
-        commandCount++;
-        localStorage.setItem('commandCount', commandCount);
-    }
-    
-    // Log the command
-    terminal.textContent += `\n> ${originalInput}`;
-    terminal.scrollTop = terminal.scrollHeight;
-    
-    // Clear input
-    terminalInput = '';
-    
-    // Execute command
-    setTimeout(() => {
-        executeTerminalCommand(command);
-    }, 100);
 }
 
 function executeTerminalCommand(command) {
     switch (command) {
             case 'help':
-                log('available commands:');
-                log('basic: help, status, time, date, clear, ping, whoami, ls, cat, echo, history');
-                log('calc: calc <expression> - e.g., calc 5+5');
-                log('encode: rot13 <text>, base64 <text>');
-                log('special: matrix, particles, admin, scan, trace, broadcast');
-                log('user: name <username>, color <green|amber|blue|red>, stats');
-                log('info: weather, uname, tree');
-                log('fun: joke, fortune, hack, coffee, dance, 42, glitch');
-                log('secret: try exploring... type "secret" for hints');
+                log('Available commands:');
+                log('Basic: help, status, time, date, clear, ping, whoami, ls, cat, echo, history');
+                log('Math: calc <expression> - e.g., calc 5+5');
+                log('Encode: rot13 <text>, base64 <text>');
+                log('System: particles, admin, scan, trace, broadcast, uname, tree');
+                log('User: name <username>, color <green|amber|blue|red>, stats');
+                log('Info: weather');
+                log('Fun: joke, fortune, hack, coffee, dance, 42, glitch');
+                log('Secret: try exploring... type "secret" for hints');
                 break;
             case 'status':
                 log(`current status: ${statusText ? statusText.textContent.replace('status: ', '') : 'monitoring'}`);
@@ -435,11 +459,6 @@ function executeTerminalCommand(command) {
                 log('downloading virus.exe...');
                 setTimeout(() => log('just kidding! stay safe online :)'), 800);
                 break;
-            case 'matrix':
-                log('there is no spoon');
-                secretsFound = Math.max(secretsFound, 1);
-                localStorage.setItem('secretsFound', secretsFound);
-                break;
             case 'noclip':
                 log('reality boundaries disabled');
                 document.body.style.transform = 'rotateZ(0.5deg)';
@@ -631,19 +650,7 @@ document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         if (terminal) { 
-            terminal.textContent = '> terminal cleared'; 
-        }
-    }
-    
-    // Ctrl/Cmd + R: Toggle Matrix Rain
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r') {
-        e.preventDefault();
-        matrixEnabled = !matrixEnabled;
-        if (matrixEnabled) { 
-            matrixRain = []; 
-            log('matrix rain activated'); 
-        } else { 
-            log('matrix rain deactivated'); 
+            terminal.textContent = 'Terminal cleared.'; 
         }
     }
     
@@ -651,9 +658,8 @@ document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         e.preventDefault();
         circles = [];
-        matrixRain = [];
         loadCircles();
-        log('canvas reset');
+        log('Canvas reset.');
     }
     
     // Ctrl/Cmd + P: Toggle particles
@@ -684,72 +690,12 @@ document.addEventListener('keydown', (e) => {
     }
     
     // Space: Random status (only when not typing in terminal)
-    if (e.key === ' ' && document.activeElement === document.body && terminalInput === '') {
+    if (e.key === ' ' && document.activeElement !== terminalInputField && terminalInput === '') {
         e.preventDefault();
         if (statusText) {
             statusText.textContent = 'status: ' + states[Math.floor(Math.random() * states.length)];
         }
         log('status randomized');
-    }
-    
-    // Enter: Process terminal command
-    if (e.key === 'Enter' && document.activeElement === document.body) {
-        e.preventDefault();
-        processTerminalCommand();
-    }
-
-    // Terminal input capturing when body is focused
-    if (document.activeElement === document.body) {
-        // Tab - Show command suggestions
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const commands = ['help', 'status', 'time', 'clear', 'ping', 'scan', 'calc', 'weather', 'stats', 
-                             'history', 'joke', 'fortune', 'hack', 'matrix', 'glitch', 'trace', 'broadcast'];
-            if (terminalInput.length > 0) {
-                const matches = commands.filter(cmd => cmd.startsWith(terminalInput.toLowerCase()));
-                if (matches.length > 0) {
-                    log(`suggestions: ${matches.join(', ')}`);
-                }
-            } else {
-                log('press TAB for command suggestions');
-            }
-        }
-        // Regular character input
-        else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-            e.preventDefault();
-            terminalInput += e.key; 
-            updateTerminalPrompt(); 
-        } 
-        // Backspace
-        else if (e.key === 'Backspace') {
-            e.preventDefault();
-            if (terminalInput.length > 0) {
-                terminalInput = terminalInput.slice(0, -1); 
-                updateTerminalPrompt();
-            }
-        } 
-        // Arrow Up - Previous command
-        else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (commandHistory.length > 0 && historyIndex > 0) { 
-                historyIndex--; 
-                terminalInput = commandHistory[historyIndex]; 
-                updateTerminalPrompt(); 
-            } 
-        } 
-        // Arrow Down - Next command
-        else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex < commandHistory.length - 1) { 
-                historyIndex++; 
-                terminalInput = commandHistory[historyIndex]; 
-                updateTerminalPrompt(); 
-            } else if (historyIndex >= commandHistory.length - 1) {
-                historyIndex = commandHistory.length; 
-                terminalInput = ''; 
-                updateTerminalPrompt(); 
-            } 
-        }
     }
 });
 
@@ -784,18 +730,6 @@ function createCircle() {
         speedY *= 1.5; 
     }
     circles.push({ x, y, radius, speedX, speedY });
-}
-
-function createMatrixDrop() {
-    return {
-        x: Math.random() * canvas.width,
-        y: -Math.random() * 200,
-        speed: Math.random() * 2 + 1,
-        chars: Array.from(
-            { length: Math.floor(Math.random() * 20 + 5) },
-            () => matrixChars.charAt(Math.floor(Math.random() * matrixChars.length))
-        )
-    };
 }
 
 function createParticle() {
@@ -847,7 +781,6 @@ function loadCircles() {
 
 function updateCanvas() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Limit FPS
     if (performance.now() - (updateCanvas.lastTime || 0) < 16) {
@@ -856,64 +789,42 @@ function updateCanvas() {
     }
     updateCanvas.lastTime = performance.now();
     
-    if (particlesEnabled && !matrixEnabled) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    if (particlesEnabled) {
         updateParticles();
         drawParticles();
     }
     
-    if (!matrixEnabled) {
-        // Draw circles and connections
-        hue = (hue + 0.3) % 360;
-        const color = "#ffffffff";
-        
-        for (const c of circles) {
-            c.x += c.speedX;
-            c.y += c.speedY;
-            if (c.x + c.radius > canvas.width || c.x - c.radius < 0) c.speedX *= -1;
-            if (c.y + c.radius > canvas.height || c.y - c.radius < 0) c.speedY *= -1;
-            ctx.beginPath();
-            ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
-        
-        // Draw connections
-        for (let i = 0; i < circles.length; i++) {
-            for (let j = i + 1; j < circles.length; j++) {
-                const a = circles[i], b = circles[j];
-                const d = Math.hypot(b.x - a.x, b.y - a.y);
-                if (d < 150) {
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = Math.max(1, 5 - d / 30);
-                    ctx.beginPath();
-                    ctx.moveTo(a.x, a.y);
-                    ctx.lineTo(b.x, b.y);
-                    ctx.stroke();
-                }
+    // Draw circles and connections
+    hue = (hue + 0.3) % 360;
+    const color = "#ffffffff";
+    
+    for (const c of circles) {
+        c.x += c.speedX;
+        c.y += c.speedY;
+        if (c.x + c.radius > canvas.width || c.x - c.radius < 0) c.speedX *= -1;
+        if (c.y + c.radius > canvas.height || c.y - c.radius < 0) c.speedY *= -1;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
+    
+    // Draw connections
+    for (let i = 0; i < circles.length; i++) {
+        for (let j = i + 1; j < circles.length; j++) {
+            const a = circles[i], b = circles[j];
+            const d = Math.hypot(b.x - a.x, b.y - a.y);
+            if (d < 150) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = Math.max(1, 5 - d / 30);
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
             }
         }
-    } else {
-        // Matrix rain effect
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#0f0';
-        ctx.font = '14px monospace';
-        
-        for (let i = matrixRain.length - 1; i >= 0; i--) {
-            const drop = matrixRain[i];
-            for (let j = 0; j < drop.chars.length; j++) {
-                const char = drop.chars[j];
-                const y = drop.y - j * 14;
-                if (y > 0 && y < canvas.height) {
-                    ctx.fillText(char, drop.x, y);
-                }
-            }
-            drop.y += drop.speed;
-            if (drop.y - drop.chars.length * 14 > canvas.height) {
-                matrixRain.splice(i, 1);
-            }
-        }
-        if (Math.random() < 0.1) matrixRain.push(createMatrixDrop());
     }
     
     requestAnimationFrame(updateCanvas);

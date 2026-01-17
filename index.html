@@ -35,9 +35,13 @@
 </head>
 <body class="no-transition">
 
+    <!-- Background Canvas Layers -->
+    <canvas id="backgroundCanvas"></canvas>
+    <canvas id="particleCanvas"></canvas>
+    
     <!-- Header with Canvas Animation -->
     <header class="header">
-        <canvas id="animationCanvas" height="130"></canvas>
+        <canvas id="animationCanvas"></canvas>
         <div class="header-content">
             <h1 id="titleEgg">trebka.net</h1>
         </div>
@@ -45,6 +49,11 @@
 
     <!-- Main Content -->
     <main>
+        <!-- Canvas Visualization Section -->
+        <section class="card canvas-section">
+            <h2>visual field</h2>
+            <canvas id="waveCanvas"></canvas>
+        </section>
         <!-- About Section -->
         <section class="card">
             <h2>about</h2>
@@ -68,10 +77,22 @@
         </section>
 
         <!-- Terminal -->
-        <section class="card terminal">
-            <pre id="terminal">> system boot
+        <section class="card terminal-container">
+            <div class="terminal-header">
+                <span class="terminal-title">terminal</span>
+                <span class="terminal-controls">
+                    <button class="terminal-btn" id="clearTerminal" title="Close"></button>
+                    <button class="terminal-btn" id="minimizeTerminal" title="Minimize"></button>
+                </span>
+            </div>
+            <div class="terminal" id="terminalOutput">Last login: Fri Jan 17 2026 on tty1
+> system boot
 > integrity check ok
-> monitoring enabled</pre>
+> monitoring enabled</div>
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">></span>
+                <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false" placeholder="type 'help' for commands...">
+            </div>
         </section>
 
         <!-- System Info -->

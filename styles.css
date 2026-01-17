@@ -114,52 +114,145 @@ main {
 }
 
 /* ===================== TERMINAL ===================== */
+.terminal-container {
+    padding: 0;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+.terminal-header {
+    background: linear-gradient(to bottom, #3c3c3c, #2a2a2a);
+    padding: 6px 12px;
+    border-bottom: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Ubuntu Mono', 'Consolas', 'Monaco', monospace;
+    color: #d4d4d4;
+    font-size: 0.75rem;
+    border-radius: 4px 4px 0 0;
+}
+
+.terminal-title {
+    font-weight: normal;
+    color: #aaa;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.terminal-btn {
+    background: #555;
+    border: none;
+    color: #222;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.terminal-btn:first-child {
+    background: #fc5753;
+}
+
+.terminal-btn:last-child {
+    background: #fdbc40;
+}
+
+.terminal-btn:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
 .terminal {
-    background: #050505;
-    font-family: monospace;
-    color: #7dff9b;
-    font-size: 0.85rem;
-    position: relative;
-    padding-bottom: 20px;
+    background: #1a1a1a;
+    font-family: 'Ubuntu Mono', 'Consolas', 'Monaco', monospace;
+    color: #d4d4d4;
+    font-size: 0.9rem;
+    padding: 12px;
     white-space: pre-wrap;
-    min-height: 150px;
+    min-height: 200px;
+    max-height: 350px;
     overflow-y: auto;
-    max-height: 300px;
     scroll-behavior: smooth;
+    line-height: 1.4;
+}
+
+.terminal.minimized {
+    max-height: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 /* Custom Scrollbar for Terminal */
 .terminal::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 .terminal::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
+    background: #0d0d0d;
 }
 
 .terminal::-webkit-scrollbar-thumb {
-    background: #7dff9b;
-    border-radius: 4px;
+    background: #444;
+    border-radius: 2px;
     transition: background 0.3s;
 }
 
 .terminal::-webkit-scrollbar-thumb:hover {
-    background: #9dffbb;
+    background: #555;
 }
 
 /* Firefox Scrollbar */
 .terminal {
     scrollbar-width: thin;
-    scrollbar-color: #7dff9b rgba(0, 0, 0, 0.3);
+    scrollbar-color: #444 #0d0d0d;
 }
 
-.terminal::after {
-    content: '█';
-    animation: blink 1s infinite;
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
+.terminal-input-line {
+    background: #1a1a1a;
+    padding: 8px 12px;
+    border-top: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.terminal-input-line.minimized {
+    display: none;
+}
+
+.terminal-prompt {
+    color: #4ec9b0;
+    font-family: 'Ubuntu Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #d4d4d4;
+    font-family: 'Ubuntu Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    caret-color: #d4d4d4;
+}
+
+.terminal-input::placeholder {
+    color: #666;
+    font-style: normal;
 }
 
 /* ===================== SYSTEM INFO ===================== */
@@ -340,6 +433,20 @@ footer .dim {
         font-size: 0.8rem;
         -webkit-overflow-scrolling: touch;
     }
+    
+    .terminal-input {
+        font-size: 0.8rem;
+    }
+    
+    .terminal-header {
+        font-size: 0.7rem;
+    }
+    
+    .terminal-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -356,18 +463,12 @@ footer .dim {
         max-height: 200px;
     }
     
-    /* Stack command buttons vertically on very small screens */
-    .commands .command-list {
-        flex-direction: column;
-    }
-    
-    .cmd-btn {
-        width: 100%;
-        padding: 12px;
+    .terminal-input {
+        font-size: 0.75rem;
     }
     
     /* Prevent zoom on input focus */
-    input, textarea, button {
+    .terminal-input, input, textarea, button {
         font-size: 16px;
     }
 }
