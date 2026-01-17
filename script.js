@@ -716,7 +716,7 @@ $id('secretOverlay')?.addEventListener('click', () => {
 /* ===================== CANVAS ANIMATION ===================== */
 if (canvas) {
     canvas.width = window.innerWidth;
-    canvas.height = 130;
+    canvas.height = 260;
 }
 
 function createCircle() {
