@@ -158,7 +158,7 @@ if (terminalInputField) {
         else if (e.key === 'Tab') {
             e.preventDefault();
             const input = terminalInputField.value.toLowerCase();
-            const commands = ['help', 'status', 'time', 'date', 'clear', 'ping', 'whoami', 'history', 
+            const commands = ['help', 'status', 'time', 'date', 'clear', 'ping', 'whoami', 'history', 'balls'
                             'weather', 'stats', 'particles', 'admin', 'scan', 'trace', 
                             'broadcast', 'glitch', 'joke', 'fortune', 'hack', 'uname', 'tree', 
                             'calc', 'echo', 'rot13', 'base64', 'name', 'color', 'secret'];
