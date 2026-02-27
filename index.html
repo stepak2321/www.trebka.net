@@ -2,17 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
     <meta name="description" content="Modern interactive experience">
     <meta name="keywords" content="Modern interactive experience">
+    <meta name="author" content="stepak2321">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="trebka.net - Modern interactive experience">
     <meta property="og:description" content="Modern interactive experience">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1495567720989-cebdbdd97913?auto=format&fit=crop&w=1600&q=80">
+    <meta property="og:url" content="https://www.trebka.net">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="trebka.net - Modern interactive experience">
     <meta name="twitter:description" content="Modern interactive experience">
-
-    <title>Example Site</title>
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1495567720989-cebdbdd97913?auto=format&fit=crop&w=1600&q=80">
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>trebka.net</title>
+    
+    <!-- External Resources -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
+    <script src="https://kit.fontawesome.com/a2e0e6ad63.js" crossorigin="anonymous" defer></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
-<body>
-    <section id="about">
-        <h1>About Us</h1>
-        <p>Modern interactive experience</p>
-    </section>
+<body class="no-transition">
+
+    <!-- Header with Canvas Animation -->
+    <header class="header">
+        <canvas id="animationCanvas" height="260" width="1371"></canvas>
+        <div class="header-content">
+            <h1 id="titleEgg">trebka.net</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- About Section -->
+        <section class="card">
+            <h2>about</h2>
+            <p>Modern interactive experience</p>
+        </section>
+
+        <!-- Update Log -->
+        <section class="card">
+            <h2>update log</h2>
+            <p class="log-entry">[2026-01-15] Added custom scrollbar styling for terminal</p>
+            <p class="log-entry">[2026-01-15] Implemented auto-scrolling feature</p>
+            <p class="log-entry">[2026-01-15] Added funny and secret commands</p>
+            <p class="log-entry">[2026-01-15] Enhanced mobile support and touch controls</p>
+            <p class="log-entry">[2026-01-15] Improved responsive design</p>
+        </section>
+
+        <!-- Secret Image -->
+        <section class="card image-card" id="imageSecret">
+            <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80" alt="secret image">
+            <span class="hint">interaction detected</span>
+        </section>
+
+        <!-- Terminal -->
+        <section class="card terminal-container">
+            <div class="terminal-header">
+                <span class="terminal-title">terminal</span>
+                <span class="terminal-controls">
+                    <button class="terminal-btn" id="clearTerminal" title="Close"></button>
+                    <button class="terminal-btn" id="minimizeTerminal" title="Minimize"></button>
+                </span>
+            </div>
+            <div class="terminal" id="terminalOutput">Last login: Fri Jan 17 2026 on tty1
+> system boot
+> integrity check ok
+> monitoring enabled</div>
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">></span>
+                <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false" placeholder="type 'help' for commands...">
+            </div>
+        </section>
+
+        <!-- System Info -->
+        <section class="card system-info">
+            <h2>system info</h2>
+            <div class="info-grid">
+                <div><span class="label">OS:</span> <span id="os-info">Unknown</span></div>
+                <div><span class="label">Browser:</span> <span id="browser-info">Unknown</span></div>
+                <div><span class="label">Resolution:</span> <span id="resolution-info">Unknown</span></div>
+                <div><span class="label">Uptime:</span> <span id="uptime-info">00:00:00</span></div>
+            </div>
+        </section>
+
+        <!-- Command Buttons -->
+        <section class="card commands">
+            <h2>available commands</h2>
+            <div class="command-list">
+                <button class="cmd-btn" data-cmd="help">help</button>
+                <button class="cmd-btn" data-cmd="status">status</button>
+                <button class="cmd-btn" data-cmd="clear">clear</button>
+                <button class="cmd-btn" data-cmd="scan">scan</button>
+                <button class="cmd-btn" data-cmd="ping">ping</button>
+                <button class="cmd-btn" data-cmd="joke">joke</button>
+                <button class="cmd-btn" data-cmd="fortune">fortune</button>
+                <button class="cmd-btn" data-cmd="hack">hack</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <span>© trebka.net</span>
+        <span class="dim">observed since 2026</span>
+    </footer>
+
+    <!-- Secret Overlay -->
+    <div id="secretOverlay"><p>ADMIN MODE ENABLED</p></div>
+
+    <!-- Audio Elements -->
+    <audio id="hoverSound" src="https://assets.mixkit.co/sfx/preview/mixkit-click-melodic-tone-1129.mp3" preload="auto"></audio>
+    <audio id="secretSound" src="https://assets.mixkit.co/sfx/preview/mixkit-ominous-drone-227.mp3" preload="auto"></audio>
+    <audio id="ambientSound" src="https://assets.mixkit.co/music/preview/mixkit-dark-ambient-246.mp3" loop preload="none"></audio>
+
+    <!-- JavaScript -->
+    <script src="script.js?v=2"></script>
 </body>
 </html>
